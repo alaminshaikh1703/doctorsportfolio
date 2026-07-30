@@ -15,7 +15,13 @@ import {
 import { DOCTOR_PROFILE } from "../../constants/doctorData";
 import { Button } from "../ui/Button";
 
-export const Footer: React.FC = () => {
+import { DoctorProfile } from "../../types";
+
+interface FooterProps {
+  doctor?: DoctorProfile;
+}
+
+export const Footer: React.FC<FooterProps> = ({ doctor = DOCTOR_PROFILE }) => {
   const [email, setEmail] = useState("");
   const [subscribed, setSubscribed] = useState(false);
 
@@ -43,10 +49,10 @@ export const Footer: React.FC = () => {
               </div>
               <div className="flex flex-col">
                 <span className="font-bold text-white text-lg tracking-tight">
-                  Dr.Farzana Mohima
+                  {doctor.name}
                 </span>
-                <span className="text-xs text-blue-400 font-semibold uppercase tracking-wider">
-                  Dental surgeon
+                <span className="text-xs text-blue-400 font-semibold uppercase tracking-wider line-clamp-1">
+                  {doctor.title}
                 </span>
               </div>
             </div>
@@ -119,7 +125,7 @@ export const Footer: React.FC = () => {
               <Clock className="w-4 h-4 text-blue-400" /> Working Hours
             </h3>
             <div className="flex flex-col gap-3 text-xs sm:text-sm text-slate-400">
-              {DOCTOR_PROFILE.workingHours.map((wh) => (
+              {doctor.workingHours.map((wh) => (
                 <div key={wh.days} className="flex flex-col pb-2 border-b border-slate-800/80">
                   <span className="font-semibold text-slate-200">{wh.days}</span>
                   <span className="text-blue-400 font-medium">{wh.hours}</span>
@@ -137,20 +143,20 @@ export const Footer: React.FC = () => {
               <div className="flex items-start gap-3">
                 <MapPin className="w-4 h-4 text-blue-400 shrink-0 mt-1" />
                 <span>
-                  {DOCTOR_PROFILE.location.address}, {DOCTOR_PROFILE.location.city},{" "}
-                  {DOCTOR_PROFILE.location.state} {DOCTOR_PROFILE.location.zip}
+                  {doctor.location.address}, {doctor.location.city},{" "}
+                  {doctor.location.state} {doctor.location.zip}
                 </span>
               </div>
               <div className="flex items-center gap-3">
                 <Phone className="w-4 h-4 text-blue-400 shrink-0" />
-                <a href={`tel:${DOCTOR_PROFILE.contact.phone}`} className="hover:text-white transition-colors">
-                  {DOCTOR_PROFILE.contact.phone}
+                <a href={`tel:${doctor.contact.phone}`} className="hover:text-white transition-colors">
+                  {doctor.contact.phone}
                 </a>
               </div>
               <div className="flex items-center gap-3">
                 <Mail className="w-4 h-4 text-blue-400 shrink-0" />
-                <a href={`mailto:${DOCTOR_PROFILE.contact.email}`} className="hover:text-white transition-colors">
-                  {DOCTOR_PROFILE.contact.email}
+                <a href={`mailto:${doctor.contact.email}`} className="hover:text-white transition-colors">
+                  {doctor.contact.email}
                 </a>
               </div>
             </div>
@@ -158,14 +164,14 @@ export const Footer: React.FC = () => {
             {/* Quick Emergency Badge */}
             <div className="mt-2 p-3 rounded-xl bg-blue-950/60 border border-blue-800/50 text-xs text-blue-300">
               <span className="font-bold text-white block">24/7 Emergency Line:</span>
-              <span>{DOCTOR_PROFILE.contact.emergencyPhone}</span>
+              <span>{doctor.contact.emergencyPhone}</span>
             </div>
           </div>
         </div>
 
         {/* Bottom Bar */}
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
-          <p>© 2026 Dr. Farzana Mohima, FACC. All Rights Reserved.</p>
+          <p>© 2026 {doctor.name}. All Rights Reserved.</p>
           <div className="flex items-center gap-6">
             <span>A product of Aavis It & Care</span>
            

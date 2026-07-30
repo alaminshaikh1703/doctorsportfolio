@@ -11,9 +11,15 @@ import { DOCTOR_PROFILE } from "../constants/doctorData";
 import { generateMedicalSvgPlaceholder, DEFAULT_BLUR_DATA_URL } from "../lib/imagePlaceholders";
 import { fadeUpVariant } from "../animations/variants";
 
-export const AboutSection: React.FC = () => {
-  const aboutDoctorImage = DOCTOR_PROFILE.aboutImage || generateMedicalSvgPlaceholder(
-    `${DOCTOR_PROFILE.name} in Consultation`,
+import { DoctorProfile } from "../types";
+
+interface AboutSectionProps {
+  doctor?: DoctorProfile;
+}
+
+export const AboutSection: React.FC<AboutSectionProps> = ({ doctor = DOCTOR_PROFILE }) => {
+  const aboutDoctorImage = doctor.aboutImage || generateMedicalSvgPlaceholder(
+    `${doctor.name} in Consultation`,
     "Patient Dialogue & Clinical Suite",
     "consultation"
   );
@@ -78,7 +84,7 @@ export const AboutSection: React.FC = () => {
             </h3>
 
             <p className="text-base text-slate-600 leading-relaxed mb-6">
-              {DOCTOR_PROFILE.bio}
+              {doctor.bio}
             </p>
 
             {/* Mission & Vision Cards */}
@@ -88,7 +94,7 @@ export const AboutSection: React.FC = () => {
                   Our Mission
                 </span>
                 <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-                  {DOCTOR_PROFILE.mission}
+                  {doctor.mission}
                 </p>
               </div>
 
@@ -97,7 +103,7 @@ export const AboutSection: React.FC = () => {
                   Our Vision
                 </span>
                 <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-                  {DOCTOR_PROFILE.vision}
+                  {doctor.vision}
                 </p>
               </div>
             </div>

@@ -16,12 +16,18 @@ import {
   floatingCardVariant,
 } from "../animations/variants";
 
-export const HeroSection: React.FC = () => {
+import { DoctorProfile } from "../types";
+
+interface HeroSectionProps {
+  doctor?: DoctorProfile;
+}
+
+export const HeroSection: React.FC<HeroSectionProps> = ({ doctor = DOCTOR_PROFILE }) => {
   const mousePosition = useMouseParallax(12);
 
-  const heroDoctorImage = DOCTOR_PROFILE.heroImage || generateMedicalSvgPlaceholder(
-    DOCTOR_PROFILE.name,
-    DOCTOR_PROFILE.title,
+  const heroDoctorImage = doctor.heroImage || generateMedicalSvgPlaceholder(
+    doctor.name,
+    doctor.title,
     "doctor"
   );
 
@@ -41,7 +47,7 @@ export const HeroSection: React.FC = () => {
       >
         <Image
           src={heroDoctorImage}
-          alt={`${DOCTOR_PROFILE.name} - ${DOCTOR_PROFILE.title}`}
+          alt={`${doctor.name} - ${doctor.title}`}
           fill
           priority
           sizes="(max-width: 768px) 100vw, 440px"

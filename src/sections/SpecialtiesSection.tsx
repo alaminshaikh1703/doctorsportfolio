@@ -7,6 +7,7 @@ import { SectionTitle } from "../components/ui/SectionTitle";
 import { Card } from "../components/ui/Card";
 import { SPECIALTIES_DATA } from "../constants/doctorData";
 import { fadeUpVariant } from "../animations/variants";
+import { Specialty } from "../types";
 
 const ICON_MAP: Record<string, React.ReactNode> = {
   Activity: <Activity className="w-6 h-6 text-blue-600" />,
@@ -15,7 +16,11 @@ const ICON_MAP: Record<string, React.ReactNode> = {
   Heart: <Heart className="w-6 h-6 text-blue-600" />,
 };
 
-export const SpecialtiesSection: React.FC = () => {
+interface SpecialtiesSectionProps {
+  specialties?: Specialty[];
+}
+
+export const SpecialtiesSection: React.FC<SpecialtiesSectionProps> = ({ specialties = SPECIALTIES_DATA }) => {
   return (
     <section id="specialties" className="py-20 lg:py-32 bg-white relative">
       <div className="max-w-[1320px] mx-auto px-4 sm:px-6 lg:px-8">
@@ -27,7 +32,7 @@ export const SpecialtiesSection: React.FC = () => {
         />
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8 mt-12">
-          {SPECIALTIES_DATA.map((spec) => (
+          {specialties.map((spec) => (
             <motion.div
               key={spec.id}
               variants={fadeUpVariant}

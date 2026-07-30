@@ -152,11 +152,9 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(orgSchema) }}
         />
       </head>
-      <body className="antialiased bg-slate-50 text-slate-800 selection:bg-blue-100 selection:text-blue-700">
+      <body className="antialiased bg-slate-50 text-slate-800 selection:bg-blue-100 selection:text-blue-700 min-h-screen flex flex-col">
         <ScrollProgressProvider />
-        <Navbar />
-        <main className="flex-1">{children}</main>
-        <Footer />
+        {children}
       </body>
     </html>
   );

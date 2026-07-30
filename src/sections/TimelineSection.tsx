@@ -7,7 +7,13 @@ import { SectionTitle } from "../components/ui/SectionTitle";
 import { TIMELINE_DATA } from "../constants/doctorData";
 import { fadeUpVariant } from "../animations/variants";
 
-export const TimelineSection: React.FC = () => {
+import { TimelineItem } from "../types";
+
+interface TimelineSectionProps {
+  timeline?: TimelineItem[];
+}
+
+export const TimelineSection: React.FC<TimelineSectionProps> = ({ timeline = TIMELINE_DATA }) => {
   return (
     <section id="timeline" className="py-20 lg:py-32 bg-slate-50/60 relative">
       <div className="max-w-[1320px] mx-auto px-4 sm:px-6 lg:px-8">
@@ -24,7 +30,7 @@ export const TimelineSection: React.FC = () => {
           <div className="absolute left-4 top-0 bottom-0 w-0.5 bg-blue-200 md:hidden" />
 
           <div className="flex flex-col gap-10">
-            {TIMELINE_DATA.map((item, index) => {
+            {timeline.map((item, index) => {
               const isEven = index % 2 === 0;
               return (
                 <motion.div

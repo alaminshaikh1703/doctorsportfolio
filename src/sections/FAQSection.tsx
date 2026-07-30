@@ -5,7 +5,13 @@ import { SectionTitle } from "../components/ui/SectionTitle";
 import { Accordion } from "../components/ui/Accordion";
 import { FAQ_DATA } from "../constants/doctorData";
 
-export const FAQSection: React.FC = () => {
+import { FAQItem } from "../types";
+
+interface FAQSectionProps {
+  faqs?: FAQItem[];
+}
+
+export const FAQSection: React.FC<FAQSectionProps> = ({ faqs = FAQ_DATA }) => {
   return (
     <section id="faq" className="py-20 lg:py-32 bg-white relative">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -17,7 +23,7 @@ export const FAQSection: React.FC = () => {
         />
 
         <div className="mt-12">
-          <Accordion items={FAQ_DATA} />
+          <Accordion items={faqs} />
         </div>
       </div>
     </section>

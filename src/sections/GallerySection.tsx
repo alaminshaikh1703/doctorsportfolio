@@ -12,11 +12,15 @@ import { fadeUpVariant } from "../animations/variants";
 
 const CATEGORIES = ["All", "Clinic", "Consultation", "Equipment", "Certificates"] as const;
 
-export const GallerySection: React.FC = () => {
+interface GallerySectionProps {
+  gallery?: GalleryItem[];
+}
+
+export const GallerySection: React.FC<GallerySectionProps> = ({ gallery = GALLERY_DATA }) => {
   const [activeCategory, setActiveCategory] = useState<string>("All");
   const [selectedImage, setSelectedImage] = useState<GalleryItem | null>(null);
 
-  const filteredItems = GALLERY_DATA.filter((item) =>
+  const filteredItems = gallery.filter((item) =>
     activeCategory === "All" ? true : item.category.toLowerCase() === activeCategory.toLowerCase()
   );
 

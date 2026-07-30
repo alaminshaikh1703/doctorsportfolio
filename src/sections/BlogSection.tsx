@@ -11,7 +11,13 @@ import { BLOG_DATA } from "../constants/doctorData";
 import { DEFAULT_BLUR_DATA_URL } from "../lib/imagePlaceholders";
 import { fadeUpVariant } from "../animations/variants";
 
-export const BlogSection: React.FC = () => {
+import { BlogPost } from "../types";
+
+interface BlogSectionProps {
+  blog?: BlogPost[];
+}
+
+export const BlogSection: React.FC<BlogSectionProps> = ({ blog = BLOG_DATA }) => {
   return (
     <section id="blog" className="py-20 lg:py-32 bg-slate-50/60 relative">
       <div className="max-w-[1320px] mx-auto px-4 sm:px-6 lg:px-8">
@@ -23,14 +29,14 @@ export const BlogSection: React.FC = () => {
             align="left"
             className="mb-0 max-w-2xl"
           />
-          <Button variant="primary" rightIcon={<ArrowRight className="w-4 h-4" />}>
+          <Button variant="outline" size="sm" rightIcon={<ArrowRight className="w-4 h-4" />}>
             View All Articles
           </Button>
         </div>
 
         {/* 3-Column Blog Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {BLOG_DATA.map((post) => (
+          {blog.map((post) => (
             <motion.div
               key={post.id}
               variants={fadeUpVariant}

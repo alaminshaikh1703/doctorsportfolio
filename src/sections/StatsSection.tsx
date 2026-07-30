@@ -14,7 +14,13 @@ const ICON_MAP: Record<string, React.ReactNode> = {
   Clock: <Clock className="w-6 h-6 text-blue-600" />,
 };
 
-export const StatsSection: React.FC = () => {
+import { StatisticItem } from "../types";
+
+interface StatsSectionProps {
+  statistics?: StatisticItem[];
+}
+
+export const StatsSection: React.FC<StatsSectionProps> = ({ statistics = STATISTICS_DATA }) => {
   return (
     <section className="py-12 bg-white border-y border-slate-200/80 relative z-20">
       <div className="max-w-[1320px] mx-auto px-4 sm:px-6 lg:px-8">
@@ -31,7 +37,7 @@ export const StatsSection: React.FC = () => {
 
           {/* Right Stats Bar */}
           <div className="lg:col-span-8 grid grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8">
-            {STATISTICS_DATA.map((stat) => (
+            {statistics.map((stat) => (
               <motion.div
                 key={stat.id}
                 variants={fadeUpVariant}

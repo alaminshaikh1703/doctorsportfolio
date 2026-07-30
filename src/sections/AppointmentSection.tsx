@@ -7,12 +7,20 @@ import { Input } from "../components/ui/Input";
 import { Textarea } from "../components/ui/Textarea";
 import { Button } from "../components/ui/Button";
 import { DOCTOR_PROFILE, SERVICES_DATA } from "../constants/doctorData";
-import { AppointmentFormData } from "../types";
+import { DoctorProfile, MedicalService, AppointmentFormData } from "../types";
 import { fadeUpVariant } from "../animations/variants";
 
-export const AppointmentSection: React.FC = () => {
+interface AppointmentSectionProps {
+  doctor?: DoctorProfile;
+  services?: MedicalService[];
+}
+
+export const AppointmentSection: React.FC<AppointmentSectionProps> = ({
+  doctor = DOCTOR_PROFILE,
+  services = SERVICES_DATA,
+}) => {
   const [formData, setFormData] = useState<AppointmentFormData>({
-    serviceId: SERVICES_DATA[0].id,
+    serviceId: services[0]?.id || SERVICES_DATA[0].id,
     patientName: "",
     patientPhone: "",
     patientEmail: "",
@@ -92,8 +100,8 @@ export const AppointmentSection: React.FC = () => {
                   </div>
                   <div className="flex flex-col">
                     <span className="font-bold text-white">Direct Line</span>
-                    <a href={`tel:${DOCTOR_PROFILE.contact.phone}`} className="text-xs text-blue-400 font-semibold hover:underline">
-                      {DOCTOR_PROFILE.contact.phone}
+                    <a href={`tel:${doctor.contact.phone}`} className="text-xs text-blue-400 font-semibold hover:underline">
+                      {doctor.contact.phone}
                     </a>
                   </div>
                 </div>
@@ -105,7 +113,7 @@ export const AppointmentSection: React.FC = () => {
                   <div className="flex flex-col">
                     <span className="font-bold text-white">Clinic Address</span>
                     <span className="text-xs text-slate-400">
-                      {DOCTOR_PROFILE.location.address}, {DOCTOR_PROFILE.location.city}, {DOCTOR_PROFILE.location.state}
+                      {doctor.location.address}, {doctor.location.city}, {doctor.location.state}
                     </span>
                   </div>
                 </div>
@@ -115,7 +123,7 @@ export const AppointmentSection: React.FC = () => {
             {/* Emergency Hotline Notice */}
             <div className="mt-10 p-4 rounded-xl bg-blue-950/80 border border-blue-800/60 text-xs">
               <span className="font-bold text-white block mb-1">Facing Acute Chest Symptoms?</span>
-              <span className="text-slate-300">Call 911 immediately or contact our 24/7 emergency hotline at {DOCTOR_PROFILE.contact.emergencyPhone}.</span>
+              <span className="text-slate-300">Call 911 immediately or contact our 24/7 emergency hotline at {doctor.contact.emergencyPhone}.</span>
             </div>
           </div>
 
@@ -176,7 +184,7 @@ export const AppointmentSection: React.FC = () => {
                       onChange={(e) => setFormData({ ...formData, serviceId: e.target.value })}
                       className="w-full bg-slate-50/80 hover:bg-slate-50 focus:bg-white text-slate-900 rounded-xl px-4 py-3 text-sm font-medium border border-slate-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20 transition-all outline-none"
                     >
-                      {SERVICES_DATA.map((serv) => (
+                      {services.map((serv) => (
                         <option key={serv.id} value={serv.id}>
                           {serv.title} ({serv.estimatedDuration})
                         </option>

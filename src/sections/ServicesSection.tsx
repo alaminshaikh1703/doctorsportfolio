@@ -12,7 +12,13 @@ import { SERVICES_DATA } from "../constants/doctorData";
 import { DEFAULT_BLUR_DATA_URL } from "../lib/imagePlaceholders";
 import { fadeUpVariant } from "../animations/variants";
 
-export const ServicesSection: React.FC = () => {
+import { MedicalService } from "../types";
+
+interface ServicesSectionProps {
+  services?: MedicalService[];
+}
+
+export const ServicesSection: React.FC<ServicesSectionProps> = ({ services = SERVICES_DATA }) => {
   return (
     <section id="services" className="py-20 lg:py-32 bg-slate-50/60 relative">
       <div className="max-w-[1320px] mx-auto px-4 sm:px-6 lg:px-8">
@@ -24,7 +30,7 @@ export const ServicesSection: React.FC = () => {
         />
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-12">
-          {SERVICES_DATA.map((serv) => (
+          {services.map((serv) => (
             <motion.div
               key={serv.id}
               variants={fadeUpVariant}

@@ -20,7 +20,13 @@ const NAV_LINKS = [
   // { name: "FAQ", href: "#faq" },
 ];
 
-export const Navbar: React.FC = () => {
+import { DoctorProfile } from "../../types";
+
+interface NavbarProps {
+  doctor?: DoctorProfile;
+}
+
+export const Navbar: React.FC<NavbarProps> = ({ doctor = DOCTOR_PROFILE }) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -42,32 +48,32 @@ export const Navbar: React.FC = () => {
           : "bg-transparent"
       )}
     >
-      <div className="max-w-[1320px] mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
+      <div className="max-w-[1320px] mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-4">
         {/* Brand / Doctor Name */}
         <Link
           href="#hero"
-          className="flex items-center gap-3 group focus-visible:outline-2 focus-visible:outline-blue-600 rounded-lg p-1"
+          className="flex items-center gap-3 group focus-visible:outline-2 focus-visible:outline-blue-600 rounded-lg p-1 min-w-0 shrink"
         >
-          <div className="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center text-white shadow-md shadow-blue-500/20 group-hover:scale-105 transition-transform">
+          <div className="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center text-white shadow-md shadow-blue-500/20 group-hover:scale-105 transition-transform shrink-0">
             <Stethoscope className="w-5 h-5" />
           </div>
-          <div className="flex flex-col">
-            <span className="font-bold text-slate-900 text-base sm:text-lg leading-tight tracking-tight">
-              Dr. Farzana Mohima
+          <div className="flex flex-col min-w-0 max-w-[200px] sm:max-w-[260px] md:max-w-[320px]">
+            <span className="font-bold text-slate-900 text-sm sm:text-base leading-tight tracking-tight truncate">
+              {doctor.name}
             </span>
-            <span className="text-xs text-blue-600 font-semibold tracking-wide uppercase">
-              Dental Specialist
+            <span className="text-[11px] text-blue-600 font-semibold tracking-wide uppercase truncate hidden sm:block">
+              {doctor.title}
             </span>
           </div>
         </Link>
 
         {/* Desktop Nav Items */}
-        <nav className="hidden xl:flex items-center gap-7">
+        <nav className="hidden lg:flex items-center gap-4 xl:gap-6 shrink-0">
           {NAV_LINKS.map((link) => (
             <Link
               key={link.name}
               href={link.href}
-              className="text-sm font-medium text-slate-600 hover:text-blue-600 transition-colors focus-visible:outline-2 focus-visible:outline-blue-600 rounded-md px-1 py-0.5"
+              className="text-xs xl:text-sm font-medium text-slate-600 hover:text-blue-600 transition-colors whitespace-nowrap focus-visible:outline-2 focus-visible:outline-blue-600 rounded-md px-1 py-0.5"
             >
               {link.name}
             </Link>
@@ -75,13 +81,13 @@ export const Navbar: React.FC = () => {
         </nav>
 
         {/* Desktop CTA & Phone */}
-        <div className="hidden sm:flex items-center gap-4">
+        <div className="hidden sm:flex items-center gap-3 shrink-0">
           <a
-            href={`tel:${DOCTOR_PROFILE.contact.phone}`}
-            className="hidden md:flex items-center gap-2 text-xs font-semibold text-slate-700 hover:text-blue-600 transition-colors bg-slate-100/80 hover:bg-blue-50 px-3.5 py-2 rounded-full border border-slate-200/60"
+            href={`tel:${doctor.contact.phone}`}
+            className="hidden xl:flex items-center gap-2 text-xs font-semibold text-slate-700 hover:text-blue-600 transition-colors bg-slate-100/80 hover:bg-blue-50 px-3.5 py-2 rounded-full border border-slate-200/60 whitespace-nowrap"
           >
             <PhoneCall className="w-3.5 h-3.5 text-blue-600" />
-            <span>{DOCTOR_PROFILE.contact.phone}</span>
+            <span>{doctor.contact.phone}</span>
           </a>
 
           <Link href="#appointment">
@@ -98,7 +104,7 @@ export const Navbar: React.FC = () => {
         {/* Mobile Hamburger Toggle */}
         <button
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className="xl:hidden p-2 rounded.xl text-slate-700 hover:bg-slate-100 transition-colors focus-visible:outline-2 focus-visible:outline-blue-600"
+          className="lg:hidden p-2 rounded-xl text-slate-700 hover:bg-slate-100 transition-colors focus-visible:outline-2 focus-visible:outline-blue-600 shrink-0"
           aria-label={mobileMenuOpen ? "Close Navigation Menu" : "Open Navigation Menu"}
         >
           {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -113,7 +119,7 @@ export const Navbar: React.FC = () => {
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.25, ease: "easeInOut" }}
-            className="xl:hidden bg-white border-b border-slate-200 shadow-xl overflow-hidden"
+            className="lg:hidden bg-white border-b border-slate-200 shadow-xl overflow-hidden"
           >
             <div className="max-w-md mx-auto px-6 py-6 flex flex-col gap-4">
               {NAV_LINKS.map((link) => (
@@ -128,11 +134,11 @@ export const Navbar: React.FC = () => {
               ))}
               <div className="pt-2 flex flex-col gap-3">
                 <a
-                  href={`tel:${DOCTOR_PROFILE.contact.phone}`}
+                  href={`tel:${doctor.contact.phone}`}
                   className="flex items-center justify-center gap-2 py-3 rounded-full bg-slate-100 text-slate-800 font-semibold text-sm"
                 >
                   <PhoneCall className="w-4 h-4 text-blue-600" />
-                  <span>Call {DOCTOR_PROFILE.contact.phone}</span>
+                  <span>Call {doctor.contact.phone}</span>
                 </a>
                 <Link href="#appointment" onClick={() => setMobileMenuOpen(false)}>
                   <Button variant="primary" className="w-full">
