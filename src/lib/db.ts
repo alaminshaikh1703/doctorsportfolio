@@ -110,8 +110,10 @@ export async function autoInitDatabaseTables(pool: mysql.Pool): Promise<{ succes
         \`id\` INT AUTO_INCREMENT PRIMARY KEY,
         \`name\` VARCHAR(255) NOT NULL,
         \`title\` VARCHAR(255) NOT NULL,
-        \`hero_image\` LONGTEXT,
-        \`about_image\` LONGTEXT,
+        \`hero_image\` TEXT,
+        \`hero_image_public_id\` VARCHAR(255),
+        \`about_image\` TEXT,
+        \`about_image_public_id\` VARCHAR(255),
         \`qualifications\` TEXT,
         \`experience_years\` INT DEFAULT 16,
         \`patients_treated\` VARCHAR(50) DEFAULT '5,400+',
@@ -135,9 +137,9 @@ export async function autoInitDatabaseTables(pool: mysql.Pool): Promise<{ succes
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
     `);
 
-    // Ensure columns support LONGTEXT for full un-truncated Base64 image storage
-    await pool.query(`ALTER TABLE doctor_profile MODIFY hero_image LONGTEXT;`).catch(() => {});
-    await pool.query(`ALTER TABLE doctor_profile MODIFY about_image LONGTEXT;`).catch(() => {});
+    // Ensure public_id columns exist for Cloudinary metadata tracking
+    await pool.query(`ALTER TABLE doctor_profile ADD COLUMN IF NOT EXISTS hero_image_public_id VARCHAR(255);`).catch(() => {});
+    await pool.query(`ALTER TABLE doctor_profile ADD COLUMN IF NOT EXISTS about_image_public_id VARCHAR(255);`).catch(() => {});
 
     await pool.query(`
       CREATE TABLE IF NOT EXISTS \`services\` (
@@ -146,37 +148,41 @@ export async function autoInitDatabaseTables(pool: mysql.Pool): Promise<{ succes
         \`short_description\` TEXT,
         \`full_description\` TEXT,
         \`icon_name\` VARCHAR(50) DEFAULT 'ClipboardList',
-        \`image\` LONGTEXT,
+        \`image\` TEXT,
+        \`image_public_id\` VARCHAR(255),
         \`key_benefits\` TEXT,
         \`estimated_duration\` VARCHAR(50) DEFAULT '45-60 mins',
         \`category\` VARCHAR(50) DEFAULT 'clinical'
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
     `);
-    await pool.query(`ALTER TABLE services MODIFY image LONGTEXT;`).catch(() => {});
+    await pool.query(`ALTER TABLE services ADD COLUMN IF NOT EXISTS image_public_id VARCHAR(255);`).catch(() => {});
 
     await pool.query(`
       CREATE TABLE IF NOT EXISTS \`testimonials\` (
         \`id\` VARCHAR(50) PRIMARY KEY,
         \`patient_name\` VARCHAR(255) NOT NULL,
         \`patient_role_or_condition\` VARCHAR(255),
-        \`patient_avatar\` LONGTEXT,
+        \`patient_avatar\` TEXT,
+        \`patient_avatar_public_id\` VARCHAR(255),
         \`rating\` INT DEFAULT 5,
         \`review_text\` TEXT NOT NULL,
         \`date\` VARCHAR(50),
         \`verified_google_review\` TINYINT(1) DEFAULT 1
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
     `);
+    await pool.query(`ALTER TABLE testimonials ADD COLUMN IF NOT EXISTS patient_avatar_public_id VARCHAR(255);`).catch(() => {});
 
     await pool.query(`
       CREATE TABLE IF NOT EXISTS \`gallery\` (
         \`id\` VARCHAR(50) PRIMARY KEY,
         \`title\` VARCHAR(255) NOT NULL,
         \`category\` VARCHAR(50) DEFAULT 'clinic',
-        \`image\` LONGTEXT NOT NULL,
+        \`image\` TEXT NOT NULL,
+        \`image_public_id\` VARCHAR(255),
         \`caption\` TEXT
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
     `);
-    await pool.query(`ALTER TABLE gallery MODIFY image LONGTEXT;`).catch(() => {});
+    await pool.query(`ALTER TABLE gallery ADD COLUMN IF NOT EXISTS image_public_id VARCHAR(255);`).catch(() => {});
 
     return { success: true };
   } catch (error) {

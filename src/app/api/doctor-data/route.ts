@@ -49,7 +49,9 @@ export async function PUT(request: Request) {
               name = ?, 
               title = ?, 
               hero_image = ?, 
+              hero_image_public_id = ?,
               about_image = ?, 
+              about_image_public_id = ?,
               bio = ?, 
               phone = ?, 
               email = ?, 
@@ -59,7 +61,9 @@ export async function PUT(request: Request) {
               doctor.name,
               doctor.title,
               doctor.heroImage,
+              doctor.heroImagePublicId || null,
               doctor.aboutImage,
+              doctor.aboutImagePublicId || null,
               doctor.bio,
               doctor.contact?.phone || "",
               doctor.contact?.email || "",
@@ -68,13 +72,15 @@ export async function PUT(request: Request) {
           );
         } else {
           await query(
-            `INSERT INTO doctor_profile (id, name, title, hero_image, about_image, bio, phone, email, address)
-             VALUES (1, ?, ?, ?, ?, ?, ?, ?, ?)`,
+            `INSERT INTO doctor_profile (id, name, title, hero_image, hero_image_public_id, about_image, about_image_public_id, bio, phone, email, address)
+             VALUES (1, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
             [
               doctor.name,
               doctor.title,
               doctor.heroImage,
+              doctor.heroImagePublicId || null,
               doctor.aboutImage,
+              doctor.aboutImagePublicId || null,
               doctor.bio,
               doctor.contact?.phone || "",
               doctor.contact?.email || "",
@@ -87,14 +93,15 @@ export async function PUT(request: Request) {
         if (services && Array.isArray(services)) {
           for (const serv of services) {
             await query(
-              `INSERT INTO services (id, title, short_description, image, estimated_duration)
-               VALUES (?, ?, ?, ?, ?)
+              `INSERT INTO services (id, title, short_description, image, image_public_id, estimated_duration)
+               VALUES (?, ?, ?, ?, ?, ?)
                ON DUPLICATE KEY UPDATE 
                 title = VALUES(title),
                 short_description = VALUES(short_description),
                 image = VALUES(image),
+                image_public_id = VALUES(image_public_id),
                 estimated_duration = VALUES(estimated_duration)`,
-              [serv.id, serv.title, serv.shortDescription, serv.image, serv.estimatedDuration]
+              [serv.id, serv.title, serv.shortDescription, serv.image, serv.imagePublicId || null, serv.estimatedDuration]
             );
           }
         }
@@ -103,14 +110,15 @@ export async function PUT(request: Request) {
         if (gallery && Array.isArray(gallery)) {
           for (const item of gallery) {
             await query(
-              `INSERT INTO gallery (id, title, category, image, caption)
-               VALUES (?, ?, ?, ?, ?)
+              `INSERT INTO gallery (id, title, category, image, image_public_id, caption)
+               VALUES (?, ?, ?, ?, ?, ?)
                ON DUPLICATE KEY UPDATE 
                 title = VALUES(title),
                 category = VALUES(category),
                 image = VALUES(image),
+                image_public_id = VALUES(image_public_id),
                 caption = VALUES(caption)`,
-              [item.id, item.title, item.category, item.image, item.caption || ""]
+              [item.id, item.title, item.category, item.image, item.imagePublicId || null, item.caption || ""]
             );
           }
         }

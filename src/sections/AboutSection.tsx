@@ -50,10 +50,7 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ doctor = DOCTOR_PROF
                   alt={doctor.name}
                   fill
                   sizes="(max-width: 768px) 100vw, 500px"
-                  placeholder={typeof aboutDoctorImage === 'string' && aboutDoctorImage.startsWith("data:") ? undefined : "blur"}
-                  blurDataURL={typeof aboutDoctorImage === 'string' && aboutDoctorImage.startsWith("data:") ? undefined : DEFAULT_BLUR_DATA_URL}
                   className="object-cover"
-                  unoptimized={typeof aboutDoctorImage === 'string' && aboutDoctorImage.startsWith("data:")}
                 />
               </div>
 

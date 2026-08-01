@@ -6,7 +6,9 @@ export interface DoctorProfile {
   name: string;
   title: string;
   heroImage?: string;
+  heroImagePublicId?: string;
   aboutImage?: string;
+  aboutImagePublicId?: string;
   qualifications: string[];
   experienceYears: number;
   patientsTreated: string; // e.g. "5,000+"
@@ -53,6 +55,7 @@ export interface MedicalService {
   fullDescription: string;
   iconName: string;
   image: string;
+  imagePublicId?: string;
   keyBenefits: string[];
   estimatedDuration: string;
   category: 'clinical' | 'surgical' | 'preventive' | 'diagnostic';
@@ -82,6 +85,7 @@ export interface PatientTestimonial {
   patientName: string;
   patientRoleOrCondition: string;
   patientAvatar: string;
+  patientAvatarPublicId?: string;
   rating: number; // 1-5
   reviewText: string;
   date: string;
@@ -93,6 +97,7 @@ export interface GalleryItem {
   title: string;
   category: 'clinic' | 'reception' | 'consultation' | 'equipment' | 'certificates';
   image: string;
+  imagePublicId?: string;
   caption: string;
 }
 
@@ -106,6 +111,7 @@ export interface BlogPost {
   excerpt: string;
   content: string;
   featuredImage: string;
+  featuredImagePublicId?: string;
   author: {
     name: string;
     avatar: string;

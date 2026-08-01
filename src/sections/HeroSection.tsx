@@ -25,11 +25,14 @@ interface HeroSectionProps {
 export const HeroSection: React.FC<HeroSectionProps> = ({ doctor = DOCTOR_PROFILE }) => {
   const mousePosition = useMouseParallax(12);
 
-  const heroDoctorImage = doctor.heroImage || generateMedicalSvgPlaceholder(
-    doctor.name,
-    doctor.title,
-    "doctor"
-  );
+  const defaultFallbackImage = "https://aavisstudio.com/wp-content/uploads/2026/07/farzana-khan-mohima.png";
+  const heroDoctorImage = doctor.heroImage || defaultFallbackImage;
+
+  const [imgSrc, setImgSrc] = React.useState(heroDoctorImage);
+
+  React.useEffect(() => {
+    setImgSrc(heroDoctorImage || defaultFallbackImage);
+  }, [heroDoctorImage]);
 
   const renderDoctorPortrait = () => (
     <motion.div
@@ -46,15 +49,13 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ doctor = DOCTOR_PROFIL
         className="w-full h-full relative rounded-[24px] overflow-hidden drop-shadow-xl"
       >
         <Image
-          src={heroDoctorImage}
+          src={imgSrc}
           alt={`${doctor.name} - ${doctor.title}`}
           fill
           priority
           sizes="(max-width: 768px) 100vw, 440px"
-          placeholder={heroDoctorImage?.startsWith("data:") ? undefined : "blur"}
-          blurDataURL={heroDoctorImage?.startsWith("data:") ? undefined : DEFAULT_BLUR_DATA_URL}
           className="object-cover object-top hover:scale-105 transition-transform duration-700"
-          unoptimized={heroDoctorImage?.startsWith("data:")}
+          onError={() => setImgSrc(defaultFallbackImage)}
         />
       </motion.div>
 

@@ -46,8 +46,6 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({ services = SER
                     alt={serv.title}
                     fill
                     sizes="(max-width: 768px) 100vw, 300px"
-                    placeholder="blur"
-                    blurDataURL={DEFAULT_BLUR_DATA_URL}
                     className="object-cover hover:scale-105 transition-transform duration-500"
                   />
                   <div className="absolute top-3 left-3 px-3 py-1 rounded-full bg-white/90 backdrop-blur-md text-[10px] font-extrabold uppercase tracking-wider text-blue-600 shadow-xs">

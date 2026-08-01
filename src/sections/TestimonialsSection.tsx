@@ -124,8 +124,6 @@ export const TestimonialsSection: React.FC<TestimonialsSectionProps> = ({
                         alt={item.patientName}
                         fill
                         sizes="44px"
-                        placeholder="blur"
-                        blurDataURL={DEFAULT_BLUR_DATA_URL}
                         className="object-cover"
                       />
                     ) : (

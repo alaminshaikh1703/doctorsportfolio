@@ -310,19 +310,37 @@ export default function AdminDashboard() {
               <ImageUploader
                 label="Hero Section Portrait Image"
                 value={data.doctor.heroImage || ""}
-                onChange={(url) =>
-                  setData({ ...data, doctor: { ...data.doctor, heroImage: url } })
+                publicId={(data.doctor as any).heroImagePublicId || ""}
+                folder="doctors"
+                onChange={(url, publicId) =>
+                  setData({
+                    ...data,
+                    doctor: {
+                      ...data.doctor,
+                      heroImage: url,
+                      ...(publicId !== undefined ? { heroImagePublicId: publicId } : {}),
+                    },
+                  })
                 }
-                description="Upload JPG or PNG image file for the main Hero Section doctor portrait."
+                description="Upload image directly to Cloudinary CDN for the main Hero Section doctor portrait."
               />
 
               <ImageUploader
                 label="About Section Doctor Image"
                 value={data.doctor.aboutImage || ""}
-                onChange={(url) =>
-                  setData({ ...data, doctor: { ...data.doctor, aboutImage: url } })
+                publicId={(data.doctor as any).aboutImagePublicId || ""}
+                folder="doctors"
+                onChange={(url, publicId) =>
+                  setData({
+                    ...data,
+                    doctor: {
+                      ...data.doctor,
+                      aboutImage: url,
+                      ...(publicId !== undefined ? { aboutImagePublicId: publicId } : {}),
+                    },
+                  })
                 }
-                description="Upload JPG or PNG image file for the About Doctor section layout."
+                description="Upload image directly to Cloudinary CDN for the About Doctor section layout."
               />
             </div>
 
@@ -394,12 +412,15 @@ export default function AdminDashboard() {
                   <ImageUploader
                     label="Service Cover Image"
                     value={serv.image}
-                    onChange={(url) => {
+                    publicId={(serv as any).imagePublicId || ""}
+                    folder="services"
+                    onChange={(url, publicId) => {
                       const newServices = [...data.services];
                       newServices[index].image = url;
+                      if (publicId !== undefined) (newServices[index] as any).imagePublicId = publicId;
                       setData({ ...data, services: newServices });
                     }}
-                    description="Upload JPG or PNG image file for this clinical service card."
+                    description="Upload image directly to Cloudinary CDN for this clinical service card."
                   />
 
                   <Textarea
@@ -504,12 +525,15 @@ export default function AdminDashboard() {
                   <ImageUploader
                     label="Gallery Photo Image"
                     value={item.image}
-                    onChange={(url) => {
+                    publicId={(item as any).imagePublicId || ""}
+                    folder="gallery"
+                    onChange={(url, publicId) => {
                       const newGallery = [...(data.gallery || [])];
                       newGallery[index].image = url;
+                      if (publicId !== undefined) (newGallery[index] as any).imagePublicId = publicId;
                       setData({ ...data, gallery: newGallery });
                     }}
-                    description="Upload JPG or PNG image file for this gallery item."
+                    description="Upload image directly to Cloudinary CDN for this clinic photo item."
                   />
 
                   <Input

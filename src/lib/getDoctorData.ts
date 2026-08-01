@@ -42,7 +42,16 @@ let inMemoryGallery: GalleryItem[] | null = null;
 let inMemoryTestimonials: PatientTestimonial[] | null = null;
 
 export function updateInMemoryData(data: Partial<FullPortfolioData>) {
-  if (data.doctor) inMemoryDoctorProfile = { ...DOCTOR_PROFILE, ...inMemoryDoctorProfile, ...data.doctor };
+  if (data.doctor) {
+    const updated = { ...DOCTOR_PROFILE, ...inMemoryDoctorProfile, ...data.doctor };
+    if (updated.heroImage && typeof updated.heroImage === 'string' && updated.heroImage.startsWith("data:")) {
+      updated.heroImage = DOCTOR_PROFILE.heroImage;
+    }
+    if (updated.aboutImage && typeof updated.aboutImage === 'string' && updated.aboutImage.startsWith("data:")) {
+      updated.aboutImage = DOCTOR_PROFILE.aboutImage;
+    }
+    inMemoryDoctorProfile = updated;
+  }
   if (data.services) inMemoryServices = data.services;
   if (data.gallery) inMemoryGallery = data.gallery;
   if (data.testimonials) inMemoryTestimonials = data.testimonials;
@@ -54,11 +63,19 @@ export async function getDoctorData(): Promise<FullPortfolioData> {
 
   if (dbRows && dbRows.length > 0) {
     const row = dbRows[0];
+    const rawHero = row.hero_image;
+    const cleanHeroImage = (rawHero && typeof rawHero === 'string' && rawHero.startsWith("data:")) ? DOCTOR_PROFILE.heroImage : (rawHero || DOCTOR_PROFILE.heroImage);
+
+    const rawAbout = row.about_image;
+    const cleanAboutImage = (rawAbout && typeof rawAbout === 'string' && rawAbout.startsWith("data:")) ? DOCTOR_PROFILE.aboutImage : (rawAbout || DOCTOR_PROFILE.aboutImage);
+
     const dbDoctorProfile: DoctorProfile = {
       name: row.name || DOCTOR_PROFILE.name,
       title: row.title || DOCTOR_PROFILE.title,
-      heroImage: row.hero_image || DOCTOR_PROFILE.heroImage,
-      aboutImage: row.about_image || DOCTOR_PROFILE.aboutImage,
+      heroImage: cleanHeroImage,
+      heroImagePublicId: row.hero_image_public_id || undefined,
+      aboutImage: cleanAboutImage,
+      aboutImagePublicId: row.about_image_public_id || undefined,
       qualifications: typeof row.qualifications === 'string' ? JSON.parse(row.qualifications) : (row.qualifications || DOCTOR_PROFILE.qualifications),
       experienceYears: row.experience_years || DOCTOR_PROFILE.experienceYears,
       patientsTreated: row.patients_treated || DOCTOR_PROFILE.patientsTreated,
@@ -84,14 +101,46 @@ export async function getDoctorData(): Promise<FullPortfolioData> {
       socials: typeof row.socials === 'string' ? JSON.parse(row.socials) : (row.socials || DOCTOR_PROFILE.socials),
     };
 
+    // Query services from database if available
+    const dbServicesRows = await query<any[]>("SELECT * FROM services");
+    let dbServices: MedicalService[] | null = null;
+    if (dbServicesRows && dbServicesRows.length > 0) {
+      dbServices = dbServicesRows.map((s) => ({
+        id: s.id,
+        title: s.title,
+        shortDescription: s.short_description || "",
+        fullDescription: s.full_description || "",
+        iconName: s.icon_name || "ClipboardList",
+        image: s.image || "",
+        imagePublicId: s.image_public_id || undefined,
+        keyBenefits: s.key_benefits ? (typeof s.key_benefits === 'string' ? JSON.parse(s.key_benefits) : s.key_benefits) : [],
+        estimatedDuration: s.estimated_duration || "45-60 mins",
+        category: s.category || "clinical",
+      }));
+    }
+
+    // Query gallery from database if available
+    const dbGalleryRows = await query<any[]>("SELECT * FROM gallery");
+    let dbGallery: GalleryItem[] | null = null;
+    if (dbGalleryRows && dbGalleryRows.length > 0) {
+      dbGallery = dbGalleryRows.map((g) => ({
+        id: g.id,
+        title: g.title,
+        category: g.category || "clinic",
+        image: g.image || "",
+        imagePublicId: g.image_public_id || undefined,
+        caption: g.caption || "",
+      }));
+    }
+
     return {
       doctor: dbDoctorProfile,
       statistics: STATISTICS_DATA,
       specialties: SPECIALTIES_DATA,
-      services: inMemoryServices || SERVICES_DATA,
+      services: inMemoryServices || dbServices || SERVICES_DATA,
       timeline: TIMELINE_DATA,
       testimonials: inMemoryTestimonials || TESTIMONIALS_DATA,
-      gallery: inMemoryGallery || GALLERY_DATA,
+      gallery: inMemoryGallery || dbGallery || GALLERY_DATA,
       blog: BLOG_DATA,
       faqs: FAQ_DATA,
       isDatabaseConnected: true,

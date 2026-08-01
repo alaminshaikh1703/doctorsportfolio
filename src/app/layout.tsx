@@ -116,7 +116,7 @@ export default function RootLayout({
   const orgSchema = generateOrganizationSchema(DOCTOR_PROFILE);
 
   return (
-    <html lang="en" className={`${plusJakartaSans.variable} ${inter.variable}`}>
+    <html lang="en" className={`${plusJakartaSans.variable} ${inter.variable}`} suppressHydrationWarning>
       <head>
         {/* JSON-LD Schemas Embedding for SEO Rich Snippets */}
         <script
@@ -152,7 +152,7 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(orgSchema) }}
         />
       </head>
-      <body className="antialiased bg-slate-50 text-slate-800 selection:bg-blue-100 selection:text-blue-700 min-h-screen flex flex-col">
+      <body className="antialiased bg-slate-50 text-slate-800 selection:bg-blue-100 selection:text-blue-700 min-h-screen flex flex-col" suppressHydrationWarning>
         <ScrollProgressProvider />
         {children}
       </body>
