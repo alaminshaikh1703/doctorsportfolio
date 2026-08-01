@@ -51,8 +51,8 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ doctor = DOCTOR_PROFIL
           fill
           priority
           sizes="(max-width: 768px) 100vw, 440px"
-          placeholder="blur"
-          blurDataURL={DEFAULT_BLUR_DATA_URL}
+          placeholder={heroDoctorImage?.startsWith("data:") ? undefined : "blur"}
+          blurDataURL={heroDoctorImage?.startsWith("data:") ? undefined : DEFAULT_BLUR_DATA_URL}
           className="object-cover object-top hover:scale-105 transition-transform duration-700"
           unoptimized={heroDoctorImage?.startsWith("data:")}
         />

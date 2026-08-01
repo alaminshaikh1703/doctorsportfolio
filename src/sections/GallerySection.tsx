@@ -69,9 +69,10 @@ export const GallerySection: React.FC<GallerySectionProps> = ({ gallery = GALLER
                 alt={item.title}
                 fill
                 sizes="(max-width: 768px) 100vw, 400px"
-                placeholder="blur"
-                blurDataURL={DEFAULT_BLUR_DATA_URL}
+                placeholder={item.image?.startsWith("data:") ? undefined : "blur"}
+                blurDataURL={item.image?.startsWith("data:") ? undefined : DEFAULT_BLUR_DATA_URL}
                 className="object-cover group-hover:scale-105 transition-transform duration-500"
+                unoptimized={item.image?.startsWith("data:")}
               />
               <div className="absolute inset-0 bg-slate-900/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center p-4">
                 <div className="w-10 h-10 rounded-full bg-white text-slate-900 flex items-center justify-center shadow-lg">
