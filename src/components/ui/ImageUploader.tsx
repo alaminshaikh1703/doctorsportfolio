@@ -12,6 +12,49 @@ interface ImageUploaderProps {
   description?: string;
 }
 
+/**
+ * Resizes and compresses image file via Canvas to generate high-quality, lightweight Base64 Data URIs
+ */
+const compressImageFile = (file: File): Promise<string> => {
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new window.Image();
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        const MAX_WIDTH = 1200;
+        const MAX_HEIGHT = 1200;
+        let width = img.width;
+        let height = img.height;
+
+        if (width > height) {
+          if (width > MAX_WIDTH) {
+            height = Math.round((height * MAX_WIDTH) / width);
+            width = MAX_WIDTH;
+          }
+        } else {
+          if (height > MAX_HEIGHT) {
+            width = Math.round((width * MAX_HEIGHT) / height);
+            height = MAX_HEIGHT;
+          }
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext("2d");
+        if (ctx) {
+          ctx.drawImage(img, 0, 0, width, height);
+          resolve(canvas.toDataURL("image/webp", 0.85));
+        } else {
+          resolve(e.target?.result as string);
+        }
+      };
+      img.src = e.target?.result as string;
+    };
+    reader.readAsDataURL(file);
+  });
+};
+
 export const ImageUploader: React.FC<ImageUploaderProps> = ({
   label,
   value,
@@ -30,6 +73,10 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
     setError(null);
 
     try {
+      // 1. First compress file via canvas for lightweight Data URI & fast upload
+      const compressedDataUri = await compressImageFile(file);
+
+      // 2. Try server API upload
       const formData = new FormData();
       formData.append("file", file);
 
@@ -40,27 +87,16 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
 
       const data = await res.json();
 
-      if (data.success && data.url) {
+      if (data.success && data.url && !data.url.startsWith("data:")) {
         onChange(data.url);
       } else {
-        // Fallback to client-side browser Base64 Data URI conversion for Vercel Serverless compatibility
-        const reader = new FileReader();
-        reader.onload = () => {
-          if (typeof reader.result === "string") {
-            onChange(reader.result);
-          }
-        };
-        reader.readAsDataURL(file);
+        // Use compressed Data URI for 100% Vercel & serverless reliability
+        onChange(compressedDataUri);
       }
     } catch (err) {
-      // Browser client-side fallback
-      const reader = new FileReader();
-      reader.onload = () => {
-        if (typeof reader.result === "string") {
-          onChange(reader.result);
-        }
-      };
-      reader.readAsDataURL(file);
+      // Fall back to compressed Data URI
+      const compressedDataUri = await compressImageFile(file);
+      onChange(compressedDataUri);
     } finally {
       setUploading(false);
     }
@@ -77,15 +113,11 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
         {/* Thumbnail Preview */}
         <div className="relative w-20 h-24 rounded-xl overflow-hidden bg-slate-200 shrink-0 border border-slate-300 flex items-center justify-center">
           {value ? (
-            <Image
+            /* eslint-disable-next-line @next/next/no-img-element */
+            <img
               src={value}
               alt="Image Preview"
-              fill
-              sizes="80px"
-              placeholder="blur"
-              blurDataURL={DEFAULT_BLUR_DATA_URL}
-              className="object-cover"
-              unoptimized={value.startsWith("data:")}
+              className="w-full h-full object-cover"
             />
           ) : (
             <ImageIcon className="w-8 h-8 text-slate-400" />
@@ -112,7 +144,7 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
               {uploading ? (
                 <>
                   <RefreshCw className="w-4 h-4 animate-spin" />
-                  <span>Uploading Image...</span>
+                  <span>Processing & Uploading...</span>
                 </>
               ) : (
                 <>
@@ -126,7 +158,7 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
               <button
                 type="button"
                 onClick={() => onChange("")}
-                className="p-2 rounded-xl bg-slate-200 hover:bg-red-100 text-slate-600 hover:text-red-600 transition-colors"
+                className="p-2 rounded-xl bg-slate-200 hover:bg-red-100 text-slate-600 hover:text-red-600 transition-colors cursor-pointer"
                 title="Remove image"
               >
                 <X className="w-4 h-4" />
