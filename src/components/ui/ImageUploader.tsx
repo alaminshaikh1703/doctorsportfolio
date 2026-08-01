@@ -43,10 +43,24 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
       if (data.success && data.url) {
         onChange(data.url);
       } else {
-        setError(data.error || "Upload failed. Please try again.");
+        // Fallback to client-side browser Base64 Data URI conversion for Vercel Serverless compatibility
+        const reader = new FileReader();
+        reader.onload = () => {
+          if (typeof reader.result === "string") {
+            onChange(reader.result);
+          }
+        };
+        reader.readAsDataURL(file);
       }
     } catch (err) {
-      setError("Network error uploading image file.");
+      // Browser client-side fallback
+      const reader = new FileReader();
+      reader.onload = () => {
+        if (typeof reader.result === "string") {
+          onChange(reader.result);
+        }
+      };
+      reader.readAsDataURL(file);
     } finally {
       setUploading(false);
     }
@@ -71,6 +85,7 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
               placeholder="blur"
               blurDataURL={DEFAULT_BLUR_DATA_URL}
               className="object-cover"
+              unoptimized={value.startsWith("data:")}
             />
           ) : (
             <ImageIcon className="w-8 h-8 text-slate-400" />

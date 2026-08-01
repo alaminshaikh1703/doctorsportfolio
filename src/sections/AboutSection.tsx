@@ -47,12 +47,13 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ doctor = DOCTOR_PROF
               <div className="relative w-full h-full rounded-[20px] overflow-hidden">
                 <Image
                   src={aboutDoctorImage}
-                  alt="Dr. Marcus Vance discussing cardiac diagnostics with patient"
+                  alt={doctor.name}
                   fill
                   sizes="(max-width: 768px) 100vw, 500px"
                   placeholder="blur"
                   blurDataURL={DEFAULT_BLUR_DATA_URL}
                   className="object-cover"
+                  unoptimized={typeof aboutDoctorImage === 'string' && aboutDoctorImage.startsWith("data:")}
                 />
               </div>
 

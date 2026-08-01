@@ -54,6 +54,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ doctor = DOCTOR_PROFIL
           placeholder="blur"
           blurDataURL={DEFAULT_BLUR_DATA_URL}
           className="object-cover object-top hover:scale-105 transition-transform duration-700"
+          unoptimized={heroDoctorImage?.startsWith("data:")}
         />
       </motion.div>
 
