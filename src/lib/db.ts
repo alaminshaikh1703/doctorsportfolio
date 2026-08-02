@@ -1,4 +1,6 @@
 import mysql from "mysql2/promise";
+import fs from "fs";
+import path from "path";
 
 interface DBConfig {
   host: string;
@@ -8,9 +10,35 @@ interface DBConfig {
   port?: number;
 }
 
+const CONFIG_FILE = path.join(process.cwd(), "src", "constants", "activeDbConfig.json");
+
+// Helper to get saved manual database URL from persistent storage
+export function getSavedDatabaseUrl(): string {
+  try {
+    if (fs.existsSync(CONFIG_FILE)) {
+      const data = JSON.parse(fs.readFileSync(CONFIG_FILE, "utf-8"));
+      if (data.databaseUrl) return data.databaseUrl;
+    }
+  } catch (e) {
+    // Ignore read errors
+  }
+  return process.env.DATABASE_URL || "";
+}
+
+// Helper to save manual database URL to persistent storage
+export function saveDatabaseUrl(url: string) {
+  try {
+    const dir = path.dirname(CONFIG_FILE);
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+    fs.writeFileSync(CONFIG_FILE, JSON.stringify({ databaseUrl: url }, null, 2), "utf-8");
+  } catch (e) {
+    // Ignore write errors in read-only serverless environments
+  }
+}
+
 // Active pool instance reference
 let activePool: mysql.Pool | null = null;
-let currentDatabaseUrl: string = process.env.DATABASE_URL || "";
+let currentDatabaseUrl: string = "";
 
 /**
  * Parses connection string format: mysql://user:password@host:port/database
@@ -52,16 +80,16 @@ export function parseDatabaseUrl(url: string): DBConfig | null {
 }
 
 /**
- * Gets or creates the MySQL connection pool from DATABASE_URL or environment variables
+ * Gets or creates the MySQL connection pool from DATABASE_URL, manual Admin URL, or environment variables
  */
 export function getPool(dbUrlOverride?: string): mysql.Pool | null {
-  const urlToUse = dbUrlOverride || currentDatabaseUrl || process.env.DATABASE_URL || "";
+  const urlToUse = dbUrlOverride || currentDatabaseUrl || getSavedDatabaseUrl() || process.env.DATABASE_URL || "";
 
   if (urlToUse) {
     const config = parseDatabaseUrl(urlToUse);
     if (config) {
-      if (!activePool || dbUrlOverride) {
-        if (activePool) activePool.end();
+      if (!activePool || dbUrlOverride || currentDatabaseUrl) {
+        if (activePool) activePool.end().catch(() => {});
         activePool = mysql.createPool({
           host: config.host,
           user: config.user,
@@ -209,9 +237,12 @@ export async function query<T = any>(sql: string, params: any[] = []): Promise<T
 }
 
 export function getCurrentDatabaseUrl(): string {
-  return currentDatabaseUrl || process.env.DATABASE_URL || "";
+  return currentDatabaseUrl || getSavedDatabaseUrl() || process.env.DATABASE_URL || "";
 }
 
 export function setCurrentDatabaseUrl(url: string) {
   currentDatabaseUrl = url;
+  if (url) {
+    saveDatabaseUrl(url);
+  }
 }

@@ -89,8 +89,16 @@ export async function PUT(request: Request) {
           );
         }
 
-        // Sync services to database
+        // Sync services to database and delete removed services
         if (services && Array.isArray(services)) {
+          if (services.length > 0) {
+            const serviceIds = services.map((s) => s.id);
+            const placeholders = serviceIds.map(() => "?").join(",");
+            await query(`DELETE FROM services WHERE id NOT IN (${placeholders})`, serviceIds).catch(() => {});
+          } else {
+            await query(`DELETE FROM services`).catch(() => {});
+          }
+
           for (const serv of services) {
             await query(
               `INSERT INTO services (id, title, short_description, image, image_public_id, estimated_duration)
@@ -106,8 +114,16 @@ export async function PUT(request: Request) {
           }
         }
 
-        // Sync gallery photos to database
+        // Sync gallery photos to database and delete removed gallery items
         if (gallery && Array.isArray(gallery)) {
+          if (gallery.length > 0) {
+            const galleryIds = gallery.map((g) => g.id);
+            const placeholders = galleryIds.map(() => "?").join(",");
+            await query(`DELETE FROM gallery WHERE id NOT IN (${placeholders})`, galleryIds).catch(() => {});
+          } else {
+            await query(`DELETE FROM gallery`).catch(() => {});
+          }
+
           for (const item of gallery) {
             await query(
               `INSERT INTO gallery (id, title, category, image, image_public_id, caption)
@@ -119,6 +135,44 @@ export async function PUT(request: Request) {
                 image_public_id = VALUES(image_public_id),
                 caption = VALUES(caption)`,
               [item.id, item.title, item.category, item.image, item.imagePublicId || null, item.caption || ""]
+            );
+          }
+        }
+
+        // Sync testimonials to database and delete removed testimonials
+        if (testimonials && Array.isArray(testimonials)) {
+          if (testimonials.length > 0) {
+            const testimonialIds = testimonials.map((t) => t.id);
+            const placeholders = testimonialIds.map(() => "?").join(",");
+            await query(`DELETE FROM testimonials WHERE id NOT IN (${placeholders})`, testimonialIds).catch(() => {});
+          } else {
+            await query(`DELETE FROM testimonials`).catch(() => {});
+          }
+
+          for (const item of testimonials) {
+            await query(
+              `INSERT INTO testimonials (id, patient_name, patient_role_or_condition, patient_avatar, patient_avatar_public_id, rating, review_text, date, verified_google_review)
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+               ON DUPLICATE KEY UPDATE 
+                patient_name = VALUES(patient_name),
+                patient_role_or_condition = VALUES(patient_role_or_condition),
+                patient_avatar = VALUES(patient_avatar),
+                patient_avatar_public_id = VALUES(patient_avatar_public_id),
+                rating = VALUES(rating),
+                review_text = VALUES(review_text),
+                date = VALUES(date),
+                verified_google_review = VALUES(verified_google_review)`,
+              [
+                item.id,
+                item.patientName,
+                item.patientRoleOrCondition,
+                item.patientAvatar,
+                item.patientAvatarPublicId || null,
+                item.rating,
+                item.reviewText,
+                item.date,
+                item.verifiedGoogleReview ? 1 : 0,
+              ]
             );
           }
         }
