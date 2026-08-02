@@ -84,7 +84,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ doctor = DOCTOR_PROFIL
           <Award className="w-4 h-4 sm:w-5 sm:h-5" />
         </div>
         <div className="flex flex-col text-[11px] sm:text-xs">
-          <span className="font-bold text-slate-900">4+ Yrs Experience</span>
+          <span className="font-bold text-slate-900">5+ Yrs Experience</span>
           <span className="text-slate-500 font-medium">Dhaka Dental clinic</span>
         </div>
       </motion.div>
@@ -154,7 +154,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ doctor = DOCTOR_PROFIL
             <motion.div variants={fadeUpVariant}>
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs sm:text-sm font-semibold tracking-wide uppercase bg-blue-50 text-blue-600 border border-blue-200/80 shadow-xs mb-6">
                 <ShieldCheck className="w-4 h-4 text-blue-600" />
-                <span>Certified Dental Surgeon</span>
+                <span>Trusted Dental Care in Dhaka</span>
               </div>
             </motion.div>
 
@@ -163,7 +163,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ doctor = DOCTOR_PROFIL
               variants={fadeUpVariant}
               className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-slate-900 leading-[1.12] tracking-tight mb-6"
             >
-              Meet <span className="text-blue-600">Farzana</span> Mohima Dental Specialist
+              Meet <span className="text-blue-600">dr. Farzana</span> Khan Mohima
             </motion.h1>
 
             {/* 3. Subheadline */}
@@ -171,7 +171,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ doctor = DOCTOR_PROFIL
               variants={fadeUpVariant}
               className="text-base sm:text-lg lg:text-xl text-slate-600 leading-relaxed mb-6 lg:mb-8 max-w-xl"
             >
-              Trusted care for every step of your teeth health journey.
+             Your smile deserves expert care.
             </motion.p>
 
             {/* 4. MOBILE PORTRAIT IMAGE (Visible right after hero texts on phone view) */}
@@ -192,13 +192,13 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ doctor = DOCTOR_PROFIL
                   rightIcon={<ArrowRight className="w-5 h-5" />}
                   className="w-full sm:w-auto"
                 >
-                  Get Appointment
+                  Get an Appointment
                 </Button>
               </Link>
 
-              <Link href="#about">
+              <Link href="#services">
                 <Button variant="outline" size="lg" className="w-full sm:w-auto">
-                  Explore Doctor Profile
+                  View Services
                 </Button>
               </Link>
             </motion.div>
@@ -226,7 +226,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ doctor = DOCTOR_PROFIL
                   <span className="font-bold text-slate-900 ml-1">4.9/5</span>
                 </div>
                 <span className="text-slate-500 font-medium">
-                  Trusted by 5,400+ satisfied patients
+                  Trusted by 500+ satisfied patients
                 </span>
               </div>
             </motion.div>

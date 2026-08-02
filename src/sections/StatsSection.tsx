@@ -28,10 +28,10 @@ export const StatsSection: React.FC<StatsSectionProps> = ({ statistics = STATIST
           {/* Left Tagline */}
           <div className="lg:col-span-4 border-b lg:border-b-0 lg:border-r border-slate-200 pb-6 lg:pb-0 lg:pr-8">
             <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 leading-tight">
-              Trusted Care for Every Step of Your Health Journey
+              Trusted Care for your Teeth
             </h2>
             <p className="mt-2 text-sm text-slate-500 font-medium">
-              Consistently rated among the top cardiovascular practices in NY.
+              Consistently rated as one of the top dental clinics in Dhaka, we prioritize your oral health and satisfaction.
             </p>
           </div>
 
