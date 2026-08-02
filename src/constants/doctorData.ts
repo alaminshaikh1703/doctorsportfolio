@@ -13,13 +13,13 @@ import { generateMedicalSvgPlaceholder } from "../lib/imagePlaceholders";
 
 export const DOCTOR_PROFILE: DoctorProfile = {
   name: "Dr. Farzana Khan Mohima",
-  title: "Lead Interventional Cardiologist & Cardiovascular Specialist",
+  title: "Lead Dental Surgeon Specialist",
   // heroImage: "https://aavisstudio.com/wp-content/uploads/2026/07/farzana-khan-mohima.png",
   qualifications: [
     "MD - Johns Hopkins University School of Medicine",
     
   ],
-  experienceYears: 4,
+  experienceYears: 5,
   patientsTreated: "500+",
   patientSatisfactionRate: 98.4,
   rating: 4.9,
