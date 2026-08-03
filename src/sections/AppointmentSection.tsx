@@ -89,8 +89,7 @@ export const AppointmentSection: React.FC<AppointmentSectionProps> = ({
                   </div>
                   <div className="flex flex-col">
                     <span className="font-bold text-white">Office Hours</span>
-                    <span className="text-xs text-slate-400">Monday – Thursday: 08:00 AM – 05:00 PM</span>
-                    <span className="text-xs text-slate-400">Friday: 08:00 AM – 03:00 PM</span>
+                    <span className="text-xs text-slate-400">Saturday – Thursday: 10:00 AM – 02:00 PM</span>
                   </div>
                 </div>
 
@@ -122,8 +121,8 @@ export const AppointmentSection: React.FC<AppointmentSectionProps> = ({
 
             {/* Emergency Hotline Notice */}
             <div className="mt-10 p-4 rounded-xl bg-blue-950/80 border border-blue-800/60 text-xs">
-              <span className="font-bold text-white block mb-1">Facing Acute Chest Symptoms?</span>
-              <span className="text-slate-300">Call 911 immediately or contact our 24/7 emergency hotline at {doctor.contact.emergencyPhone}.</span>
+              <span className="font-bold text-white block mb-1">Facing Dental Pain?</span>
+              <span className="text-slate-300">Call immediately or contact our 24/7 emergency hotline at {doctor.contact.emergencyPhone}.</span>
             </div>
           </div>
 

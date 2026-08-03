@@ -28,9 +28,9 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ doctor = DOCTOR_PROF
     <section id="about" className="py-20 lg:py-32 bg-slate-50/50 relative overflow-hidden">
       <div className="max-w-[1320px] mx-auto px-4 sm:px-6 lg:px-8">
         <SectionTitle
-          label="About Doctor"
-          title="Supporting Your Health At Every Stage Of Life"
-          subtitle="Committed to individualized cardiovascular care, evidence-based treatment protocols, and medical excellence."
+          label={`About ${doctor.name}`}
+          title="Dedicated To Your Oral Health & Beautiful Smile"
+          // subtitle="Committed to individualized cardiovascular care, evidence-based treatment protocols, and medical excellence."
           align="center"
         />
 
@@ -61,8 +61,8 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ doctor = DOCTOR_PROF
                     <Award className="w-5 h-5" />
                   </div>
                   <div className="flex flex-col text-xs">
-                    <span className="font-bold text-slate-900">FACC Accredited Fellow</span>
-                    <span className="text-slate-500 font-medium">American College of Cardiology</span>
+                    <span className="font-bold text-slate-900">BMDC Registered</span>
+                    <span className="text-slate-500 font-medium">Board of Medical Dentistry</span>
                   </div>
                 </div>
               </div>
@@ -78,7 +78,7 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ doctor = DOCTOR_PROF
             className="lg:col-span-7 flex flex-col items-start text-left"
           >
             <h3 className="text-2xl sm:text-3xl font-bold text-slate-900 leading-snug mb-4">
-              Pioneering Human-Centric Cardiovascular Medicine
+              Pioneering Patient-Centric Dental care.
             </h3>
 
             <p className="text-base text-slate-600 leading-relaxed mb-6">
@@ -89,7 +89,7 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ doctor = DOCTOR_PROF
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full mb-8">
               <div className="p-5 rounded-[20px] bg-white border border-slate-200/80 shadow-xs">
                 <span className="text-xs font-bold uppercase tracking-wider text-blue-600 mb-1 block">
-                  Our Mission
+                  My Mission
                 </span>
                 <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
                   {doctor.mission}
@@ -98,7 +98,7 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ doctor = DOCTOR_PROF
 
               <div className="p-5 rounded-[20px] bg-white border border-slate-200/80 shadow-xs">
                 <span className="text-xs font-bold uppercase tracking-wider text-blue-600 mb-1 block">
-                  Our Vision
+                  My Vision
                 </span>
                 <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
                   {doctor.vision}
@@ -109,10 +109,10 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ doctor = DOCTOR_PROF
             {/* Key Bullet Points (Matching Reference) */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full mb-8">
               {[
-                { title: "100% Secure & Confidential", desc: "Strict HIPAA compliance & private suites", icon: ShieldCheck },
-                { title: "Award-winning Healthcare", desc: "Top National Cardiology Recognition 2023", icon: Award },
-                { title: "24/7 Expert Support", desc: "Direct patient portal & emergency line", icon: Clock },
-                { title: "Evidence-Based Treatment", desc: "Customized clinical care pathways", icon: CheckCircle2 },
+                { title: "100% Secure & Experienced", desc: "Committed to patient safety and clinical excellence", icon: ShieldCheck },
+                { title: "Conservative Dentistry Training", desc: "Specialized training in conservative dental procedures", icon: Award },
+                { title: "Prosthodontics Training", desc: "Specialized training in prosthodontic procedures", icon: Award },
+                { title: "Patient-Centered Care", desc: "Personalized treatment plans tailored to your needs", icon: CheckCircle2 },
               ].map((item) => {
                 const Icon = item.icon;
                 return (
@@ -131,7 +131,7 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ doctor = DOCTOR_PROF
 
             <Link href="#timeline">
               <Button variant="primary" rightIcon={<ArrowRight className="w-4 h-4" />}>
-                View Doctor Credentials & Timeline
+                View Doctor's Timeline
               </Button>
             </Link>
           </motion.div>

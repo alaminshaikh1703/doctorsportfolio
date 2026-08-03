@@ -19,8 +19,8 @@ export const TimelineSection: React.FC<TimelineSectionProps> = ({ timeline = TIM
       <div className="max-w-[1320px] mx-auto px-4 sm:px-6 lg:px-8">
         <SectionTitle
           label="Education & Experience"
-          title="A Distinguished Career in Cardiovascular Medicine"
-          subtitle="Trained at Johns Hopkins and Harvard institutions, backed by board certifications and national clinical awards."
+          title="Education, Clinical Training & Experience"
+          // subtitle="Trained at Johns Hopkins and Harvard institutions, backed by board certifications and national clinical awards."
           align="center"
         />
 

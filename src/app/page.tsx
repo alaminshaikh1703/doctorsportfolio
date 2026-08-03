@@ -28,7 +28,7 @@ export default async function Home() {
         <StatsSection statistics={data.statistics} />
         <AboutSection doctor={data.doctor} />
         <AppointmentSection doctor={data.doctor} services={data.services} />
-        <SpecialtiesSection specialties={data.specialties} />
+        {/* <SpecialtiesSection specialties={data.specialties} /> */}
         <ServicesSection services={data.services} />
         <WhyChooseSection />
         <TimelineSection timeline={data.timeline} />

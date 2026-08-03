@@ -24,8 +24,8 @@ export const BlogSection: React.FC<BlogSectionProps> = ({ blog = BLOG_DATA }) =>
         <div className="flex flex-col md:flex-row items-start md:items-end justify-between gap-6 mb-12">
           <SectionTitle
             label="Health Insights"
-            title="Explore Our Latest Cardiovascular Articles"
-            subtitle="Evidence-based patient guidance on preventive heart care, hypertension control, and vascular health."
+            title="Explore Our Latest DentalArticles"
+            // subtitle="Evidence-based patient guidance on preventive heart care, hypertension control, and vascular health."
             align="left"
             className="mb-0 max-w-2xl"
           />

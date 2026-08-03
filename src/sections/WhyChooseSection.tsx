@@ -16,35 +16,35 @@ import { fadeUpVariant } from "../animations/variants";
 
 const WHY_CHOOSE_ITEMS = [
   {
-    title: "Evidence-Based Treatment",
-    desc: "All clinical management plans follow American College of Cardiology guidelines.",
+    title: "Personalized Treatment",
+    desc: "Every treatment plan is customized according to your oral health needs.",
     icon: ShieldCheck,
   },
   {
-    title: "Modern Equipment",
-    desc: "Ultra-low dose fluoroscopy and 3D digital color Doppler ultrasound.",
+    title: "Gentle Dental Care",
+    desc: "Comfortable and pain-conscious dental treatment for patients of all ages.",
     icon: Cpu,
   },
   {
-    title: "Patient-First Care",
-    desc: "Acoustic private consultation suites designed for compassionate listening.",
+    title: "Modern Clinical Techniques",
+    desc: "Evidence-based dentistry with updated clinical approaches.",
     icon: Heart,
   },
-  {
-    title: "Transparent & Affordable",
-    desc: "Direct insurance verification with clear, zero-hidden-fee pricing options.",
-    icon: DollarSign,
-  },
-  {
-    title: "Ethical Practice",
-    desc: "Zero unnecessary interventional procedures — absolute medical integrity.",
-    icon: Award,
-  },
-  {
-    title: "Experienced Specialist",
-    desc: "16+ years of interventional mastery with over 5,400 successful procedures.",
-    icon: Users,
-  },
+  // {
+  //   title: "Honest Consultation",
+  //   desc: "Clear explanation of treatment options before every procedure.",
+  //   icon: Award,
+  // },
+  // {
+  //   title: "Preventive Focus",
+  //   desc: "Helping patients prevent dental problems before they become serious.",
+  //   icon: Award,
+  // },
+  // {
+  //   title: "Ethical Practice",
+  //   desc: "Treatments recommended only when clinically necessary.",
+  //   icon: Users,
+  // },
 ];
 
 export const WhyChooseSection: React.FC = () => {
@@ -52,9 +52,9 @@ export const WhyChooseSection: React.FC = () => {
     <section className="py-20 lg:py-32 bg-white relative">
       <div className="max-w-[1320px] mx-auto px-4 sm:px-6 lg:px-8">
         <SectionTitle
-          label="Why Choose Us"
-          title="Why Patients Trust Dr. Marcus Vance"
-          subtitle="Combining high-precision cardiac medicine with a warm, patient-centered clinic experience."
+          label="Why Choose me"
+          title="Why Patients Trust Dr. Farzana Khan Mohima"
+          subtitle="Trusted Dental Care With Modern Treatment & Compassionate Approach"
           align="center"
         />
 

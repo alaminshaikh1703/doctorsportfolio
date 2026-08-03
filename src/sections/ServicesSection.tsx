@@ -23,9 +23,9 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({ services = SER
     <section id="services" className="py-20 lg:py-32 bg-slate-50/60 relative">
       <div className="max-w-[1320px] mx-auto px-4 sm:px-6 lg:px-8">
         <SectionTitle
-          label="Clinical Services"
-          title="Full-Spectrum Cardiovascular Diagnostics & Procedures"
-          subtitle="Delivered in a state-of-the-art private clinical environment focused on safety, speed, and comfort."
+          label="Dental Services"
+          title="Comprehensive Dental Treatments"
+          subtitle="From preventive care to advanced procedures, we offer a full range of dental services tailored to your needs."
           align="center"
         />
 

@@ -29,8 +29,8 @@ export const GallerySection: React.FC<GallerySectionProps> = ({ gallery = GALLER
       <div className="max-w-[1320px] mx-auto px-4 sm:px-6 lg:px-8">
         <SectionTitle
           label="Gallery"
-          title="Inside Our State-of-the-Art Clinic & Diagnostics Center"
-          subtitle="Designed to provide absolute patient privacy, hospitality, and ultra-high precision cardiac imaging."
+          title="Inside Our Dental Clinic"
+          subtitle="Modern facilities designed for comfortable dental treatment."
           align="center"
         />
 

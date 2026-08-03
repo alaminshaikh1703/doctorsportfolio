@@ -7,11 +7,11 @@ import { SectionTitle } from "../components/ui/SectionTitle";
 import { fadeUpVariant } from "../animations/variants";
 
 const JOURNEY_STEPS = [
-  { step: 1, title: "Book", desc: "Select preferred slot online or call clinic", icon: CalendarCheck },
-  { step: 2, title: "Consult", desc: "Detailed 60-min private dialogue with Dr. Vance", icon: Stethoscope },
-  { step: 3, title: "Diagnosis", desc: "3D Echo or ECG precision diagnostics", icon: Microscope },
-  { step: 4, title: "Treatment", desc: "Personalized medical or interventional care", icon: HeartPulse },
-  { step: 5, title: "Recovery", desc: "Continuous patient portal monitoring & rehab", icon: Smile },
+  { step: 1, title: "Book Appointment", desc: "Choose your convenient appointment time.", icon: CalendarCheck },
+  { step: 2, title: "Dental Examination", desc: "Comprehensive oral health assessment.", icon: Stethoscope },
+  { step: 3, title: "Treatment Planning", desc: "Personalized treatment recommendations.", icon: Microscope },
+  { step: 4, title: "Dental Procedure", desc: "Safe and comfortable dental treatment.", icon: HeartPulse },
+  { step: 5, title: "Follow-Up Care", desc: "Guidance to maintain long-term oral health.", icon: Smile },
 ];
 
 export const PatientJourneySection: React.FC = () => {
@@ -20,8 +20,8 @@ export const PatientJourneySection: React.FC = () => {
       <div className="max-w-[1320px] mx-auto px-4 sm:px-6 lg:px-8">
         <SectionTitle
           label="Patient Journey"
-          title="Seamless 5-Step Clinical Care Process"
-          subtitle="From your initial consultation to long-term cardiac wellness — transparent, simple, and supportive."
+          title="Seamless 5-Step Dental Care Process"
+          subtitle=""
           align="center"
         />
 
