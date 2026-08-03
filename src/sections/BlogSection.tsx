@@ -25,7 +25,7 @@ export const BlogSection: React.FC<BlogSectionProps> = ({ blog = BLOG_DATA }) =>
           <SectionTitle
             label="Health Insights"
             title="Explore Our Latest DentalArticles"
-            // subtitle="Evidence-based patient guidance on preventive heart care, hypertension control, and vascular health."
+            subtitle="Evidence-based patient guidance on preventive heart care, hypertension control, and vascular health."
             align="left"
             className="mb-0 max-w-2xl"
           />

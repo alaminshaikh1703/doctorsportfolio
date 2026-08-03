@@ -228,25 +228,25 @@ export const GALLERY_DATA: GalleryItem[] = [
   },
 ];
 
-// export const BLOG_DATA: BlogPost[] = [
-//   {
-//     id: "blog-1",
-//     title: "Understanding Coronary Calcium Scores: When Should You Get Screened?",
-//     slug: "understanding-coronary-calcium-scores",
-//     category: "Preventive Care",
-//     readTime: "5 min read",
-//     date: "July 18, 2026",
-//     excerpt: "Discover how non-invasive CT coronary calcium scoring detects hidden arterial plaque years before symptoms manifest.",
-//     content: "Coronary artery calcium scoring is one of the most effective non-invasive screening tools in modern cardiology...",
-//     featuredImage: generateMedicalSvgPlaceholder("Coronary Calcium", "Preventive Heart Health Article", "clinic"),
-//     author: {
-//       name: "Dr. Marcus Vance, MD",
-//       avatar: generateMedicalSvgPlaceholder("Dr. Vance", "Author", "doctor"),
-//       role: "Lead Cardiologist",
-//     },
-//   },
+export const BLOG_DATA: BlogPost[] = [
+  {
+    id: "blog-1",
+    title: "Understanding Coronary Calcium Scores: When Should You Get Screened?",
+    slug: "understanding-coronary-calcium-scores",
+    category: "Preventive Care",
+    readTime: "5 min read",
+    date: "July 18, 2026",
+    excerpt: "Discover how non-invasive CT coronary calcium scoring detects hidden arterial plaque years before symptoms manifest.",
+    content: "Coronary artery calcium scoring is one of the most effective non-invasive screening tools in modern cardiology...",
+    featuredImage: generateMedicalSvgPlaceholder("Coronary Calcium", "Preventive Heart Health Article", "clinic"),
+    author: {
+      name: "Dr. Marcus Vance, MD",
+      avatar: generateMedicalSvgPlaceholder("Dr. Vance", "Author", "doctor"),
+      role: "Lead Cardiologist",
+    },
+  },
   
-// ];
+];
 
 export const FAQ_DATA: FAQItem[] = [
   {
