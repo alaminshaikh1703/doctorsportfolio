@@ -131,7 +131,7 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ doctor = DOCTOR_PROF
 
             <Link href="#timeline">
               <Button variant="primary" rightIcon={<ArrowRight className="w-4 h-4" />}>
-                View Doctor's Timeline
+                View Doctor&apos;s Timeline
               </Button>
             </Link>
           </motion.div>
