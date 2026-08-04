@@ -248,7 +248,7 @@ export default function AdminDashboard() {
               />
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               <Input
                 label="Phone Number"
                 value={data.doctor.contact.phone}
@@ -258,6 +258,18 @@ export default function AdminDashboard() {
                     doctor: { ...data.doctor, contact: { ...data.doctor.contact, phone: e.target.value } },
                   })
                 }
+              />
+
+              <Input
+                label="WhatsApp Number (for Appointments)"
+                value={data.doctor.contact.whatsappNumber || ""}
+                onChange={(e) =>
+                  setData({
+                    ...data,
+                    doctor: { ...data.doctor, contact: { ...data.doctor.contact, whatsappNumber: e.target.value } },
+                  })
+                }
+                placeholder="e.g. +8801531714840"
               />
 
               <Input

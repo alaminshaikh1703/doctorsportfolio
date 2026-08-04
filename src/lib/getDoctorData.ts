@@ -96,6 +96,7 @@ export async function getDoctorData(): Promise<FullPortfolioData> {
         phone: row.phone || DOCTOR_PROFILE.contact.phone,
         emergencyPhone: row.emergency_phone || DOCTOR_PROFILE.contact.emergencyPhone,
         email: row.email || DOCTOR_PROFILE.contact.email,
+        whatsappNumber: row.whatsapp_number || DOCTOR_PROFILE.contact.whatsappNumber || row.phone || DOCTOR_PROFILE.contact.phone,
       },
       workingHours: typeof row.working_hours === 'string' ? JSON.parse(row.working_hours) : (row.working_hours || DOCTOR_PROFILE.workingHours),
       socials: typeof row.socials === 'string' ? JSON.parse(row.socials) : (row.socials || DOCTOR_PROFILE.socials),

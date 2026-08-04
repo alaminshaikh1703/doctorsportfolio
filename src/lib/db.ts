@@ -158,6 +158,7 @@ export async function autoInitDatabaseTables(pool: mysql.Pool): Promise<{ succes
         \`google_maps_url\` TEXT,
         \`phone\` VARCHAR(50),
         \`emergency_phone\` VARCHAR(50),
+        \`whatsapp_number\` VARCHAR(50),
         \`email\` VARCHAR(100),
         \`working_hours\` TEXT,
         \`socials\` TEXT,
@@ -165,9 +166,10 @@ export async function autoInitDatabaseTables(pool: mysql.Pool): Promise<{ succes
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
     `);
 
-    // Ensure public_id columns exist for Cloudinary metadata tracking
+    // Ensure public_id and whatsapp_number columns exist for metadata tracking
     await pool.query(`ALTER TABLE doctor_profile ADD COLUMN IF NOT EXISTS hero_image_public_id VARCHAR(255);`).catch(() => {});
     await pool.query(`ALTER TABLE doctor_profile ADD COLUMN IF NOT EXISTS about_image_public_id VARCHAR(255);`).catch(() => {});
+    await pool.query(`ALTER TABLE doctor_profile ADD COLUMN IF NOT EXISTS whatsapp_number VARCHAR(50);`).catch(() => {});
 
     await pool.query(`
       CREATE TABLE IF NOT EXISTS \`services\` (

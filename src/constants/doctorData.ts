@@ -39,6 +39,7 @@ export const DOCTOR_PROFILE: DoctorProfile = {
     phone: "+880 1531-714840",
     emergencyPhone: "+880 1531-714840",
     email: "fkmohima2@gmail.com",
+    whatsappNumber: "+8801531714840",
   },
   workingHours: [
     { days: "Saturday – Thursday", hours: "10:00 AM – 02:00 PM" },

@@ -29,6 +29,7 @@ export interface DoctorProfile {
     phone: string;
     emergencyPhone: string;
     email: string;
+    whatsappNumber?: string;
   };
   workingHours: {
     days: string;

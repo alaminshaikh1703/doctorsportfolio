@@ -54,6 +54,8 @@ export async function PUT(request: Request) {
               about_image_public_id = ?,
               bio = ?, 
               phone = ?, 
+              emergency_phone = ?,
+              whatsapp_number = ?,
               email = ?, 
               address = ? 
             WHERE id = 1`,
@@ -66,14 +68,16 @@ export async function PUT(request: Request) {
               doctor.aboutImagePublicId || null,
               doctor.bio,
               doctor.contact?.phone || "",
+              doctor.contact?.emergencyPhone || "",
+              doctor.contact?.whatsappNumber || doctor.contact?.phone || "",
               doctor.contact?.email || "",
               doctor.location?.address || "",
             ]
           );
         } else {
           await query(
-            `INSERT INTO doctor_profile (id, name, title, hero_image, hero_image_public_id, about_image, about_image_public_id, bio, phone, email, address)
-             VALUES (1, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+            `INSERT INTO doctor_profile (id, name, title, hero_image, hero_image_public_id, about_image, about_image_public_id, bio, phone, emergency_phone, whatsapp_number, email, address)
+             VALUES (1, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
             [
               doctor.name,
               doctor.title,
@@ -83,6 +87,8 @@ export async function PUT(request: Request) {
               doctor.aboutImagePublicId || null,
               doctor.bio,
               doctor.contact?.phone || "",
+              doctor.contact?.emergencyPhone || "",
+              doctor.contact?.whatsappNumber || doctor.contact?.phone || "",
               doctor.contact?.email || "",
               doctor.location?.address || "",
             ]

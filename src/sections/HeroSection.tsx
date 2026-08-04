@@ -26,12 +26,19 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ doctor = DOCTOR_PROFIL
   const mousePosition = useMouseParallax(12);
 
   const defaultFallbackImage = "https://aavisstudio.com/wp-content/uploads/2026/07/farzana-khan-mohima.png";
-  const heroDoctorImage = doctor.heroImage || defaultFallbackImage;
+  const heroDoctorImage =
+    typeof doctor?.heroImage === "string" && doctor.heroImage.trim() !== ""
+      ? doctor.heroImage
+      : defaultFallbackImage;
 
   const [imgSrc, setImgSrc] = React.useState(heroDoctorImage);
 
   React.useEffect(() => {
-    setImgSrc(heroDoctorImage || defaultFallbackImage);
+    const validSrc =
+      typeof heroDoctorImage === "string" && heroDoctorImage.trim() !== ""
+        ? heroDoctorImage
+        : defaultFallbackImage;
+    setImgSrc(validSrc);
   }, [heroDoctorImage]);
 
   const renderDoctorPortrait = () => (

@@ -18,11 +18,14 @@ interface AboutSectionProps {
 }
 
 export const AboutSection: React.FC<AboutSectionProps> = ({ doctor = DOCTOR_PROFILE }) => {
-  const aboutDoctorImage = doctor.aboutImage || generateMedicalSvgPlaceholder(
-    `${doctor.name} in Consultation`,
-    "Patient Dialogue & Clinical Suite",
-    "consultation"
-  );
+  const aboutDoctorImage =
+    typeof doctor?.aboutImage === "string" && doctor.aboutImage.trim() !== ""
+      ? doctor.aboutImage
+      : generateMedicalSvgPlaceholder(
+          `${doctor.name} in Consultation`,
+          "Patient Dialogue & Clinical Suite",
+          "consultation"
+        );
 
   return (
     <section id="about" className="py-20 lg:py-32 bg-slate-50/50 relative overflow-hidden">

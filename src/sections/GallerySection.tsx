@@ -7,7 +7,7 @@ import { X, ZoomIn } from "lucide-react";
 import { SectionTitle } from "../components/ui/SectionTitle";
 import { GALLERY_DATA } from "../constants/doctorData";
 import { GalleryItem } from "../types";
-import { DEFAULT_BLUR_DATA_URL } from "../lib/imagePlaceholders";
+import { generateMedicalSvgPlaceholder } from "../lib/imagePlaceholders";
 import { fadeUpVariant } from "../animations/variants";
 
 const CATEGORIES = ["All", "Clinic", "Consultation", "Equipment", "Certificates"] as const;
@@ -53,35 +53,41 @@ export const GallerySection: React.FC<GallerySectionProps> = ({ gallery = GALLER
 
         {/* Image Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredItems.map((item) => (
-            <motion.div
-              key={item.id}
-              layout
-              variants={fadeUpVariant}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, margin: "-30px" }}
-              onClick={() => setSelectedImage(item)}
-              className="group relative aspect-[4/3] rounded-[20px] overflow-hidden bg-slate-100 border border-slate-200/80 cursor-pointer shadow-xs hover:shadow-xl transition-all duration-300"
-            >
-              <Image
-                src={item.image}
-                alt={item.title}
-                fill
-                sizes="(max-width: 768px) 100vw, 400px"
-                className="object-cover group-hover:scale-105 transition-transform duration-500"
-              />
-              <div className="absolute inset-0 bg-slate-900/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center p-4">
-                <div className="w-10 h-10 rounded-full bg-white text-slate-900 flex items-center justify-center shadow-lg">
-                  <ZoomIn className="w-5 h-5" />
+          {filteredItems.map((item) => {
+            const itemImgSrc =
+              typeof item?.image === "string" && item.image.trim() !== ""
+                ? item.image
+                : generateMedicalSvgPlaceholder(item?.title || "Clinic Gallery", item?.category || "Clinic", "clinic");
+
+            return (
+              <motion.div
+                key={item.id}
+                variants={fadeUpVariant}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, margin: "-40px" }}
+                onClick={() => setSelectedImage(item)}
+                className="group relative aspect-[4/3] rounded-[20px] overflow-hidden bg-slate-100 border border-slate-200/80 cursor-pointer shadow-xs hover:shadow-xl transition-all duration-300"
+              >
+                <Image
+                  src={itemImgSrc}
+                  alt={item.title || "Gallery Photo"}
+                  fill
+                  sizes="(max-width: 768px) 100vw, 400px"
+                  className="object-cover group-hover:scale-105 transition-transform duration-500"
+                />
+                <div className="absolute inset-0 bg-slate-900/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center p-4">
+                  <div className="w-10 h-10 rounded-full bg-white text-slate-900 flex items-center justify-center shadow-lg">
+                    <ZoomIn className="w-5 h-5" />
+                  </div>
                 </div>
-              </div>
-              <div className="absolute bottom-0 inset-x-0 p-4 bg-gradient-to-t from-slate-900/80 via-slate-900/40 to-transparent text-white">
-                <span className="text-xs font-bold block">{item.title}</span>
-                <span className="text-[10px] text-slate-300 capitalize">{item.category}</span>
-              </div>
-            </motion.div>
-          ))}
+                <div className="absolute bottom-0 inset-x-0 p-4 bg-gradient-to-t from-slate-900/80 via-slate-900/40 to-transparent text-white">
+                  <span className="text-xs font-bold block">{item.title}</span>
+                  <span className="text-[10px] text-slate-300 capitalize">{item.category}</span>
+                </div>
+              </motion.div>
+            );
+          })}
         </div>
 
         {/* Lightbox Modal */}
@@ -109,8 +115,12 @@ export const GallerySection: React.FC<GallerySectionProps> = ({ gallery = GALLER
                 </button>
                 <div className="relative aspect-[16/10] w-full rounded-[18px] overflow-hidden bg-slate-100">
                   <Image
-                    src={selectedImage.image}
-                    alt={selectedImage.title}
+                    src={
+                      typeof selectedImage?.image === "string" && selectedImage.image.trim() !== ""
+                        ? selectedImage.image
+                        : generateMedicalSvgPlaceholder(selectedImage?.title || "Gallery Photo", selectedImage?.category || "Clinic", "clinic")
+                    }
+                    alt={selectedImage.title || "Gallery Photo"}
                     fill
                     className="object-cover"
                   />
