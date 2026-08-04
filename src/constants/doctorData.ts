@@ -148,6 +148,15 @@ export const TIMELINE_DATA: TimelineItem[] = [
   },
   {
     id: "time-2",
+    year: "Jul 2022- Jun 2023",
+    title: "PGT",
+    institution: "Sapporo Dental College & Hospital",
+    degreeOrRole: "Post Graduate Training in Dental Surgery",
+    type: "residency",
+    description: "",
+  },
+  {
+    id: "time-3",
     year: "2020",
     title: "BDS",
     institution: "Sapporo Dental College & Hospital",
@@ -155,8 +164,9 @@ export const TIMELINE_DATA: TimelineItem[] = [
     type: "residency",
     description: "",
   },
-   {
-    id: "time-3",
+   
+  {
+    id: "time-4",
     year: "2025",
     title: "Current Practice",
     institution: "Aveek's Dental & Implant Center",
@@ -165,7 +175,7 @@ export const TIMELINE_DATA: TimelineItem[] = [
     description: "",
   },
   {
-    id: "time-4",
+    id: "time-5",
     year: "2024",
     title: "Current Practice",
     institution: "My Dentist & Maxillofacial Surgery",

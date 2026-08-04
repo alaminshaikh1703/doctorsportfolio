@@ -16,6 +16,11 @@ import {
   Trash2,
   BookOpen,
   Globe,
+  Lock,
+  LogOut,
+  Eye,
+  EyeOff,
+  ShieldCheck,
 } from "lucide-react";
 import { Button } from "../../components/ui/Button";
 import { Input } from "../../components/ui/Input";
@@ -32,20 +37,71 @@ export default function AdminPage() {
     "profile" | "images" | "services" | "gallery" | "blog" | "seo" | "database"
   >("profile");
 
+  // Authentication State
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const [loginEmail, setLoginEmail] = useState<string>("");
+  const [loginPassword, setLoginPassword] = useState<string>("");
+  const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [authenticating, setAuthenticating] = useState<boolean>(false);
+  const [authError, setAuthError] = useState<string | null>(null);
+
   useEffect(() => {
-    async function fetchData() {
-      try {
-        const res = await fetch("/api/doctor-data");
-        const json = await res.json();
-        setData(json);
-      } catch (err) {
-        setMessage({ text: "Failed to load doctor profile data", type: "error" });
-      } finally {
-        setLoading(false);
-      }
+    // Check sessionStorage (cleared automatically when browser window/tab closes)
+    const sessionToken = sessionStorage.getItem("admin_session_token");
+    if (sessionToken === "aavisit_admin_authenticated_session") {
+      setIsAuthenticated(true);
     }
-    fetchData();
   }, []);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      async function fetchData() {
+        try {
+          const res = await fetch("/api/doctor-data");
+          const json = await res.json();
+          setData(json);
+        } catch (err) {
+          setMessage({ text: "Failed to load doctor profile data", type: "error" });
+        } finally {
+          setLoading(false);
+        }
+      }
+      fetchData();
+    }
+  }, [isAuthenticated]);
+
+  const handleLoginSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setAuthenticating(true);
+    setAuthError(null);
+
+    try {
+      const res = await fetch("/api/admin-auth", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: loginEmail, password: loginPassword }),
+      });
+
+      const result = await res.json();
+      if (result.success && result.token) {
+        sessionStorage.setItem("admin_session_token", result.token);
+        setIsAuthenticated(true);
+      } else {
+        setAuthError(result.error || "Invalid credentials. Access denied.");
+      }
+    } catch (err) {
+      setAuthError("Network error authenticating credentials.");
+    } finally {
+      setAuthenticating(false);
+    }
+  };
+
+  const handleLogout = async () => {
+    sessionStorage.removeItem("admin_session_token");
+    await fetch("/api/admin-auth", { method: "DELETE" }).catch(() => {});
+    setIsAuthenticated(false);
+    setLoginPassword("");
+  };
 
   const handleAddService = () => {
     if (!data) return;
@@ -146,6 +202,97 @@ export default function AdminPage() {
     }
   };
 
+  // Render Admin Login Screen if not authenticated
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col items-center justify-center p-4 sm:p-6 relative overflow-hidden">
+        {/* Soft Ambient Background Glows */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] bg-gradient-to-tr from-blue-400/15 via-indigo-300/10 to-sky-400/20 rounded-full blur-[140px] pointer-events-none"></div>
+        <div className="absolute inset-0 bg-[radial-gradient(#e2e8f0_1px,transparent_1px)] [background-size:24px_24px] opacity-70 pointer-events-none"></div>
+
+        <div className="w-full max-w-md bg-white/95 backdrop-blur-2xl border border-slate-200/90 rounded-[32px] p-8 sm:p-10 shadow-2xl shadow-slate-900/10 relative z-10">
+          <div className="flex flex-col items-center text-center mb-8">
+            <div className="w-16 h-16 rounded-2xl bg-blue-600 flex items-center justify-center text-white shadow-xl shadow-blue-600/30 mb-4 transform hover:scale-105 transition-transform">
+              <Stethoscope className="w-8 h-8" />
+            </div>
+            <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Admin Portal Access</h1>
+            <p className="text-xs font-semibold text-blue-600 tracking-wide uppercase mt-1.5">
+              Doctor's Data • Management
+            </p>
+          </div>
+
+          {authError && (
+            <div className="p-4 rounded-2xl bg-red-50 border border-red-200 text-red-700 text-xs font-semibold mb-6 flex items-center gap-2.5">
+              <AlertCircle className="w-4 h-4 text-red-600 shrink-0" />
+              <span>{authError}</span>
+            </div>
+          )}
+
+          <form onSubmit={handleLoginSubmit} className="flex flex-col gap-5">
+            <div>
+              <label className="text-xs font-bold uppercase tracking-wider text-slate-700 block mb-2">
+                Admin Username / Email
+              </label>
+              <div className="relative">
+                <input
+                  type="email"
+                  required
+                  value={loginEmail}
+                  onChange={(e) => setLoginEmail(e.target.value)}
+                  placeholder="example@gmail.com"
+                  className="w-full bg-white text-slate-900 font-semibold border border-slate-300 rounded-2xl px-4 py-3.5 text-sm focus:outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-100 placeholder-slate-400 transition-all"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="text-xs font-bold uppercase tracking-wider text-slate-700 block mb-2">
+                Password
+              </label>
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  required
+                  value={loginPassword}
+                  onChange={(e) => setLoginPassword(e.target.value)}
+                  placeholder="•••••••"
+                  className="w-full bg-white text-slate-900 font-semibold border border-slate-300 rounded-2xl px-4 py-3.5 text-sm focus:outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-100 placeholder-slate-400 transition-all pr-12"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700 transition-colors p-1"
+                >
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+            </div>
+
+            <Button
+              type="submit"
+              variant="primary"
+              className="w-full mt-2 py-4 text-sm font-bold rounded-2xl shadow-xl shadow-blue-600/25 active:scale-[0.99] transition-transform"
+              isLoading={authenticating}
+              leftIcon={<ShieldCheck className="w-5 h-5" />}
+            >
+              Sign In to Admin Panel
+            </Button>
+          </form>
+
+          <div className="mt-8 pt-6 border-t border-slate-100 text-center">
+            <Link
+              href="/"
+              className="text-xs font-bold text-slate-500 hover:text-blue-600 transition-colors inline-flex items-center justify-center gap-1.5"
+            >
+              <ArrowLeft className="w-3.5 h-3.5" />
+              <span>Return to Main Website</span>
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   if (loading || !data) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-50">
@@ -166,6 +313,7 @@ export default function AdminPage() {
             <Link
               href="/"
               className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition-colors"
+              title="View Live Website"
             >
               <ArrowLeft className="w-5 h-5" />
             </Link>
@@ -201,6 +349,15 @@ export default function AdminPage() {
             >
               Save Changes
             </Button>
+
+            <button
+              onClick={handleLogout}
+              className="p-2.5 rounded-xl bg-slate-800 hover:bg-red-950 text-slate-300 hover:text-red-400 border border-slate-700 hover:border-red-800 transition-colors flex items-center gap-1.5 text-xs font-semibold cursor-pointer"
+              title="Log Out of Admin Session"
+            >
+              <LogOut className="w-4 h-4" />
+              <span className="hidden sm:inline">Log Out</span>
+            </button>
           </div>
         </div>
       </header>
