@@ -88,8 +88,13 @@ export function getPool(dbUrlOverride?: string): mysql.Pool | null {
   if (urlToUse) {
     const config = parseDatabaseUrl(urlToUse);
     if (config) {
-      if (!activePool || dbUrlOverride || currentDatabaseUrl) {
-        if (activePool) activePool.end().catch(() => {});
+      // Only recreate pool if activePool is null or URL has changed
+      if (!activePool || (dbUrlOverride && dbUrlOverride !== currentDatabaseUrl) || (currentDatabaseUrl && currentDatabaseUrl !== urlToUse)) {
+        if (activePool) {
+          try {
+            activePool.end().catch(() => {});
+          } catch (e) {}
+        }
         activePool = mysql.createPool({
           host: config.host,
           user: config.user,
@@ -99,7 +104,7 @@ export function getPool(dbUrlOverride?: string): mysql.Pool | null {
           waitForConnections: true,
           connectionLimit: 10,
           queueLimit: 0,
-          connectTimeout: 5000,
+          connectTimeout: 10000,
         });
         currentDatabaseUrl = urlToUse;
       }
@@ -119,7 +124,7 @@ export function getPool(dbUrlOverride?: string): mysql.Pool | null {
         waitForConnections: true,
         connectionLimit: 10,
         queueLimit: 0,
-        connectTimeout: 5000,
+        connectTimeout: 10000,
       });
     }
     return activePool;
@@ -166,10 +171,15 @@ export async function autoInitDatabaseTables(pool: mysql.Pool): Promise<{ succes
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
     `);
 
-    // Ensure public_id and whatsapp_number columns exist for metadata tracking
+    // Ensure public_id, whatsapp_number, and SEO columns exist for metadata tracking
     await pool.query(`ALTER TABLE doctor_profile ADD COLUMN IF NOT EXISTS hero_image_public_id VARCHAR(255);`).catch(() => {});
     await pool.query(`ALTER TABLE doctor_profile ADD COLUMN IF NOT EXISTS about_image_public_id VARCHAR(255);`).catch(() => {});
     await pool.query(`ALTER TABLE doctor_profile ADD COLUMN IF NOT EXISTS whatsapp_number VARCHAR(50);`).catch(() => {});
+    await pool.query(`ALTER TABLE doctor_profile ADD COLUMN IF NOT EXISTS seo_title TEXT;`).catch(() => {});
+    await pool.query(`ALTER TABLE doctor_profile ADD COLUMN IF NOT EXISTS seo_description TEXT;`).catch(() => {});
+    await pool.query(`ALTER TABLE doctor_profile ADD COLUMN IF NOT EXISTS seo_keywords TEXT;`).catch(() => {});
+    await pool.query(`ALTER TABLE doctor_profile ADD COLUMN IF NOT EXISTS og_image TEXT;`).catch(() => {});
+    await pool.query(`ALTER TABLE doctor_profile ADD COLUMN IF NOT EXISTS og_image_public_id VARCHAR(255);`).catch(() => {});
 
     await pool.query(`
       CREATE TABLE IF NOT EXISTS \`services\` (
@@ -214,6 +224,24 @@ export async function autoInitDatabaseTables(pool: mysql.Pool): Promise<{ succes
     `);
     await pool.query(`ALTER TABLE gallery ADD COLUMN IF NOT EXISTS image_public_id VARCHAR(255);`).catch(() => {});
 
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS \`blog\` (
+        \`id\` VARCHAR(50) PRIMARY KEY,
+        \`title\` VARCHAR(255) NOT NULL,
+        \`slug\` VARCHAR(255),
+        \`category\` VARCHAR(100) DEFAULT 'Dental Health',
+        \`read_time\` VARCHAR(50) DEFAULT '5 min read',
+        \`date\` VARCHAR(50),
+        \`excerpt\` TEXT,
+        \`content\` LONGTEXT,
+        \`featured_image\` TEXT,
+        \`featured_image_public_id\` VARCHAR(255),
+        \`author_name\` VARCHAR(255),
+        \`author_role\` VARCHAR(255)
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+    `);
+    await pool.query(`ALTER TABLE blog ADD COLUMN IF NOT EXISTS featured_image_public_id VARCHAR(255);`).catch(() => {});
+
     return { success: true };
   } catch (error) {
     const msg = (error as Error).message;
@@ -233,7 +261,11 @@ export async function query<T = any>(sql: string, params: any[] = []): Promise<T
     const [rows] = await pool.execute(sql, params);
     return rows as T;
   } catch (error) {
-    console.warn("MySQL Database connection query failed, using static fallback dataset:", (error as Error).message);
+    const errMsg = (error as Error).message;
+    console.warn("MySQL Database connection query failed, using static fallback dataset:", errMsg);
+    if (errMsg.includes("closed") || errMsg.includes("PROTOCOL") || errMsg.includes("ECONNRESET")) {
+      activePool = null;
+    }
     return null;
   }
 }
@@ -243,8 +275,16 @@ export function getCurrentDatabaseUrl(): string {
 }
 
 export function setCurrentDatabaseUrl(url: string) {
-  currentDatabaseUrl = url;
-  if (url) {
-    saveDatabaseUrl(url);
+  if (currentDatabaseUrl !== url) {
+    currentDatabaseUrl = url;
+    if (activePool) {
+      try {
+        activePool.end().catch(() => {});
+      } catch (e) {}
+      activePool = null;
+    }
+    if (url) {
+      saveDatabaseUrl(url);
+    }
   }
 }

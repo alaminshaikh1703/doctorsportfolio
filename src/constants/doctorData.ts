@@ -52,6 +52,10 @@ export const DOCTOR_PROFILE: DoctorProfile = {
     { platform: "facebook", url: "https://www.facebook.com/DrFarzanaDentist" },
     { platform: "youtube", url: "https://youtube.com" },
   ],
+  seoTitle: "Dr. Farzana Khan Mohima | Lead Dental Surgeon Specialist",
+  seoDescription: "Official portfolio of Dr. Farzana Khan Mohima, Lead Dental Surgeon Specialist. Book priority appointments online, explore dental specialties, clinic gallery & patient reviews.",
+  seoKeywords: "Dr. Farzana Khan Mohima, Dental Surgeon, Dental Specialist, Dental Implant Specialist, Paediatric Dentistry, Teeth Whitening, Root Canal",
+  ogImage: "https://aavisstudio.com/wp-content/uploads/2026/07/farzana-khan-mohima.png",
 };
 
 export const STATISTICS_DATA: StatisticItem[] = [
@@ -241,9 +245,9 @@ export const BLOG_DATA: BlogPost[] = [
     content: "Coronary artery calcium scoring is one of the most effective non-invasive screening tools in modern cardiology...",
     featuredImage: generateMedicalSvgPlaceholder("Coronary Calcium", "Preventive Heart Health Article", "clinic"),
     author: {
-      name: "Dr. Marcus Vance, MD",
-      avatar: generateMedicalSvgPlaceholder("Dr. Vance", "Author", "doctor"),
-      role: "Lead Cardiologist",
+      name: "dr farzana khan mohima",
+      avatar: generateMedicalSvgPlaceholder("Dr.Farzana Khan Mohima", "Author", "doctor"),
+      role: "Lead Dental Surgeon",
     },
   },
   

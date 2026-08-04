@@ -173,7 +173,9 @@ export const Footer: React.FC<FooterProps> = ({ doctor = DOCTOR_PROFILE }) => {
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
           <p>© 2026 {doctor.name}. All Rights Reserved.</p>
           <div className="flex items-center gap-6">
-            <span>A product of Aavis It & Care</span>
+            <span>A product of <Link href="https://it.aavisstudio.com" target="_blank" className="hover:text-white transition-colors">
+              Aavis It & Care
+            </Link></span>
            
            
             <button

@@ -49,7 +49,7 @@ const WHY_CHOOSE_ITEMS = [
 
 export const WhyChooseSection: React.FC = () => {
   return (
-    <section className="py-20 lg:py-32 bg-white relative">
+    <section id="specialties" className="py-20 lg:py-32 bg-white relative scroll-mt-20">
       <div className="max-w-[1320px] mx-auto px-4 sm:px-6 lg:px-8">
         <SectionTitle
           label="Why Choose me"

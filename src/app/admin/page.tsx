@@ -14,76 +14,105 @@ import {
   RefreshCw,
   Plus,
   Trash2,
+  BookOpen,
+  Globe,
 } from "lucide-react";
 import { Button } from "../../components/ui/Button";
 import { Input } from "../../components/ui/Input";
 import { Textarea } from "../../components/ui/Textarea";
 import { ImageUploader } from "../../components/ui/ImageUploader";
-import { FullPortfolioData } from "../../lib/getDoctorData";
-import { MedicalService, GalleryItem } from "../../types";
+import { FullPortfolioData, BlogPost } from "../../types";
 
-export default function AdminDashboard() {
+export default function AdminPage() {
   const [data, setData] = useState<FullPortfolioData | null>(null);
-  const [activeTab, setActiveTab] = useState<"profile" | "images" | "services" | "gallery" | "database">("profile");
+  const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<{ text: string; type: "success" | "error" } | null>(null);
+  const [activeTab, setActiveTab] = useState<
+    "profile" | "images" | "services" | "gallery" | "blog" | "seo" | "database"
+  >("profile");
 
   useEffect(() => {
-    fetchDoctorData();
-  }, []);
-
-  const fetchDoctorData = async () => {
-    try {
-      const res = await fetch("/api/doctor-data");
-      const json = await res.json();
-      setData(json);
-    } catch (err) {
-      console.error("Failed to fetch doctor data:", err);
+    async function fetchData() {
+      try {
+        const res = await fetch("/api/doctor-data");
+        const json = await res.json();
+        setData(json);
+      } catch (err) {
+        setMessage({ text: "Failed to load doctor profile data", type: "error" });
+      } finally {
+        setLoading(false);
+      }
     }
-  };
+    fetchData();
+  }, []);
 
   const handleAddService = () => {
     if (!data) return;
-    const newService: MedicalService = {
-      id: `service_${Date.now()}`,
-      title: "New Clinical Service",
-      shortDescription: "Enter description of this medical procedure or service.",
-      fullDescription: "",
+    const newService = {
+      id: `service-${Date.now()}`,
+      title: "New Dental Treatment",
+      shortDescription: "Short description of the treatment...",
+      fullDescription: "Full description...",
       iconName: "Stethoscope",
-      image: "https://aavisstudio.com/wp-content/uploads/2026/07/farzana-khan-mohima.png",
-      keyBenefits: ["Advanced Diagnostic Precision", "Compassionate Patient Care"],
-      estimatedDuration: "45 mins",
-      category: "clinical",
+      image: "",
+      keyBenefits: ["Pain-free procedure", "High success rate", "Quick recovery"],
+      estimatedDuration: "30-45 mins",
+      category: "clinical" as const,
     };
-    setData({ ...data, services: [...data.services, newService] });
+    setData({ ...data, services: [...(data.services || []), newService] });
   };
 
-  const handleDeleteService = (index: number) => {
+  const handleDeleteService = (id: string) => {
     if (!data) return;
-    const updatedServices = data.services.filter((_, i) => i !== index);
-    setData({ ...data, services: updatedServices });
+    setData({ ...data, services: (data.services || []).filter((s) => s.id !== id) });
   };
 
   const handleAddGalleryItem = () => {
     if (!data) return;
-    const newGalleryItem: GalleryItem = {
-      id: `gallery_${Date.now()}`,
-      title: "New Clinic Facility Photo",
-      category: "clinic",
-      image: "https://aavisstudio.com/wp-content/uploads/2026/07/farzana-khan-mohima.png",
-      caption: "High precision medical facility photo.",
+    const newItem = {
+      id: `gallery-${Date.now()}`,
+      title: "New Clinic Photo",
+      category: "clinic" as const,
+      image: "",
+      caption: "Description of the facility photo...",
     };
-    setData({ ...data, gallery: [...(data.gallery || []), newGalleryItem] });
+    setData({ ...data, gallery: [...(data.gallery || []), newItem] });
   };
 
-  const handleDeleteGalleryItem = (index: number) => {
+  const handleDeleteGalleryItem = (id: string) => {
     if (!data) return;
-    const updatedGallery = (data.gallery || []).filter((_, i) => i !== index);
-    setData({ ...data, gallery: updatedGallery });
+    setData({ ...data, gallery: (data.gallery || []).filter((g) => g.id !== id) });
   };
 
-  const handleSave = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleAddBlogPost = () => {
+    if (!data) return;
+    const newPost: BlogPost = {
+      id: `blog-${Date.now()}`,
+      title: "New Dental Health Article",
+      slug: `new-dental-article-${Date.now().toString().slice(-4)}`,
+      category: "Dental Care",
+      readTime: "5 min read",
+      date: new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }),
+      excerpt: "Short summary of the article for patient guidance...",
+      content: "Detailed article content discussing oral health recommendations...",
+      featuredImage: "",
+      author: {
+        name: data.doctor.name,
+        avatar: data.doctor.heroImage || "",
+        role: data.doctor.title,
+      },
+    };
+    setData({ ...data, blog: [newPost, ...(data.blog || [])] });
+  };
+
+  const handleDeleteBlogPost = (id: string) => {
+    if (!data) return;
+    setData({ ...data, blog: (data.blog || []).filter((b) => b.id !== id) });
+  };
+
+  const handleSave = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
     if (!data) return;
 
     setSaving(true);
@@ -98,13 +127,14 @@ export default function AdminDashboard() {
           services: data.services,
           gallery: data.gallery,
           testimonials: data.testimonials,
+          blog: data.blog,
           databaseUrl: (data as any).databaseUrl || "",
         }),
       });
 
       const result = await res.json();
       if (result.success) {
-        setMessage({ text: "Portfolio details & image uploads synced successfully!", type: "success" });
+        setMessage({ text: "Portfolio details, articles, SEO & images synced successfully!", type: "success" });
         setData(result.data);
       } else {
         setMessage({ text: result.error || "Failed to update portfolio data", type: "error" });
@@ -116,7 +146,7 @@ export default function AdminDashboard() {
     }
   };
 
-  if (!data) {
+  if (loading || !data) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-50">
         <div className="flex items-center gap-3 text-blue-600 font-semibold text-sm">
@@ -145,7 +175,7 @@ export default function AdminDashboard() {
               </div>
               <div className="flex flex-col">
                 <h1 className="text-lg font-bold text-white tracking-tight">Doctor Portfolio Admin Panel</h1>
-                <span className="text-xs text-blue-400 font-medium">Manage Doctor Information, Image Uploads & MySQL</span>
+                <span className="text-xs text-blue-400 font-medium">Manage Doctor Information, Image Uploads, Blog & SEO</span>
               </div>
             </div>
           </div>
@@ -199,10 +229,12 @@ export default function AdminDashboard() {
         <div className="flex items-center gap-2 border-b border-slate-200 pb-4 mb-8 overflow-x-auto">
           {[
             { id: "profile", label: "Doctor Profile", icon: UserCheck },
-            { id: "images", label: "Hero & Section Image Uploads", icon: ImageIcon },
+            { id: "images", label: "Hero & Section Images", icon: ImageIcon },
             { id: "services", label: "Clinical Services", icon: Stethoscope },
             { id: "gallery", label: "Clinic Gallery", icon: ImageIcon },
-            { id: "database", label: "MySQL Setup & SQL Schema", icon: Database },
+            { id: "blog", label: "Health Articles & Blog", icon: BookOpen },
+            { id: "seo", label: "SEO & Meta Tags", icon: Globe },
+            { id: "database", label: "MySQL Setup & Schema", icon: Database },
           ].map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
@@ -230,7 +262,7 @@ export default function AdminDashboard() {
               Basic Doctor Profile Information
             </h2>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <Input
                 label="Full Doctor Name"
                 value={data.doctor.name}
@@ -330,11 +362,11 @@ export default function AdminDashboard() {
                     doctor: {
                       ...data.doctor,
                       heroImage: url,
-                      ...(publicId !== undefined ? { heroImagePublicId: publicId } : {}),
-                    },
+                      heroImagePublicId: publicId,
+                    } as any,
                   })
                 }
-                description="Upload image directly to Cloudinary CDN for the main Hero Section doctor portrait."
+                helperText="Upload image directly to Cloudinary CDN for the main Hero Section doctor portrait."
               />
 
               <ImageUploader
@@ -348,15 +380,15 @@ export default function AdminDashboard() {
                     doctor: {
                       ...data.doctor,
                       aboutImage: url,
-                      ...(publicId !== undefined ? { aboutImagePublicId: publicId } : {}),
-                    },
+                      aboutImagePublicId: publicId,
+                    } as any,
                   })
                 }
-                description="Upload image directly to Cloudinary CDN for the About Doctor section layout."
+                helperText="Upload image directly to Cloudinary CDN for the About Doctor section layout."
               />
             </div>
 
-            <div className="flex justify-end pt-4 border-t border-slate-100">
+            <div className="flex justify-end pt-4">
               <Button type="submit" variant="primary" isLoading={saving} leftIcon={<Save className="w-4 h-4" />}>
                 Save Image Uploads
               </Button>
@@ -367,95 +399,70 @@ export default function AdminDashboard() {
         {/* Tab 3: Clinical Services */}
         {activeTab === "services" && (
           <div className="bg-white p-6 sm:p-8 rounded-[24px] border border-slate-200 shadow-sm flex flex-col gap-6">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-slate-100">
-              <div>
-                <h2 className="text-xl font-bold text-slate-900">Manage Clinical Services</h2>
-                <span className="text-xs text-slate-500 font-medium">Add, edit, upload images, or delete medical services displayed on your website.</span>
-              </div>
-              <Button
-                type="button"
-                onClick={handleAddService}
-                variant="outline"
-                size="sm"
-                leftIcon={<Plus className="w-4 h-4 text-blue-600" />}
-              >
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+              <h2 className="text-xl font-bold text-slate-900">Clinical Services</h2>
+              <Button type="button" onClick={handleAddService} variant="outline" size="sm" leftIcon={<Plus className="w-4 h-4" />}>
                 Add New Service
               </Button>
             </div>
 
             <div className="flex flex-col gap-6">
-              {data.services.map((serv, index) => (
-                <div key={serv.id} className="p-5 rounded-[20px] bg-slate-50 border border-slate-200 flex flex-col gap-4 relative group">
-                  <div className="flex items-center justify-between pb-3 border-b border-slate-200/80">
-                    <span className="text-xs font-bold uppercase tracking-wider text-blue-600">
-                      Service #{index + 1}
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() => handleDeleteService(index)}
-                      className="flex items-center gap-1 text-xs font-bold text-red-600 hover:text-red-700 bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-full border border-red-200 transition-colors cursor-pointer"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                      <span>Delete Service</span>
-                    </button>
-                  </div>
+              {data.services?.map((serv, index) => (
+                <div key={serv.id} className="p-5 rounded-2xl bg-slate-50 border border-slate-200 flex flex-col gap-4 relative">
+                  <button
+                    type="button"
+                    onClick={() => handleDeleteService(serv.id)}
+                    className="absolute top-4 right-4 p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-colors"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <Input
                       label="Service Title"
                       value={serv.title}
                       onChange={(e) => {
-                        const newServices = [...data.services];
+                        const newServices = [...(data.services || [])];
                         newServices[index].title = e.target.value;
                         setData({ ...data, services: newServices });
                       }}
                     />
+
                     <Input
                       label="Estimated Duration"
                       value={serv.estimatedDuration}
                       onChange={(e) => {
-                        const newServices = [...data.services];
+                        const newServices = [...(data.services || [])];
                         newServices[index].estimatedDuration = e.target.value;
                         setData({ ...data, services: newServices });
                       }}
                     />
                   </div>
 
-                  <ImageUploader
-                    label="Service Cover Image"
-                    value={serv.image}
-                    publicId={(serv as any).imagePublicId || ""}
-                    folder="services"
-                    onChange={(url, publicId) => {
-                      const newServices = [...data.services];
-                      newServices[index].image = url;
-                      if (publicId !== undefined) (newServices[index] as any).imagePublicId = publicId;
-                      setData({ ...data, services: newServices });
-                    }}
-                    description="Upload image directly to Cloudinary CDN for this clinical service card."
-                  />
-
                   <Textarea
-                    label="Short Description"
+                    label="Short Summary"
                     value={serv.shortDescription}
                     onChange={(e) => {
-                      const newServices = [...data.services];
+                      const newServices = [...(data.services || [])];
                       newServices[index].shortDescription = e.target.value;
+                      setData({ ...data, services: newServices });
+                    }}
+                  />
+
+                  <ImageUploader
+                    label="Service Cover Image (Cloudinary CDN)"
+                    value={serv.image || ""}
+                    publicId={serv.imagePublicId || ""}
+                    folder="services"
+                    onChange={(url, publicId) => {
+                      const newServices = [...(data.services || [])];
+                      newServices[index].image = url;
+                      newServices[index].imagePublicId = publicId;
                       setData({ ...data, services: newServices });
                     }}
                   />
                 </div>
               ))}
-
-              {data.services.length === 0 && (
-                <div className="text-center py-12 bg-slate-50 rounded-[20px] border border-dashed border-slate-300">
-                  <p className="text-sm font-semibold text-slate-600">No clinical services found.</p>
-                  <p className="text-xs text-slate-500 mt-1 mb-4">Click below to add your first medical service.</p>
-                  <Button type="button" onClick={handleAddService} variant="primary" size="sm" leftIcon={<Plus className="w-4 h-4" />}>
-                    Add New Service
-                  </Button>
-                </div>
-              )}
             </div>
 
             <div className="flex justify-end pt-4 border-t border-slate-100">
@@ -469,107 +476,48 @@ export default function AdminDashboard() {
         {/* Tab 4: Clinic Gallery */}
         {activeTab === "gallery" && (
           <div className="bg-white p-6 sm:p-8 rounded-[24px] border border-slate-200 shadow-sm flex flex-col gap-6">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-slate-100">
-              <div>
-                <h2 className="text-xl font-bold text-slate-900">Manage Clinic & Diagnostics Gallery</h2>
-                <span className="text-xs text-slate-500 font-medium">
-                  Add, edit photo names, category, caption details, upload images, or delete gallery photos displayed on your website.
-                </span>
-              </div>
-              <Button
-                type="button"
-                onClick={handleAddGalleryItem}
-                variant="outline"
-                size="sm"
-                leftIcon={<Plus className="w-4 h-4 text-blue-600" />}
-              >
-                Add New Gallery Photo
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+              <h2 className="text-xl font-bold text-slate-900">Clinic Gallery Photos</h2>
+              <Button type="button" onClick={handleAddGalleryItem} variant="outline" size="sm" leftIcon={<Plus className="w-4 h-4" />}>
+                Add Gallery Photo
               </Button>
             </div>
 
-            <div className="flex flex-col gap-6">
-              {(data.gallery || []).map((item, index) => (
-                <div key={item.id} className="p-5 rounded-[20px] bg-slate-50 border border-slate-200 flex flex-col gap-4 relative group">
-                  <div className="flex items-center justify-between pb-3 border-b border-slate-200/80">
-                    <span className="text-xs font-bold uppercase tracking-wider text-blue-600">
-                      Photo #{index + 1}
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() => handleDeleteGalleryItem(index)}
-                      className="flex items-center gap-1 text-xs font-bold text-red-600 hover:text-red-700 bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-full border border-red-200 transition-colors cursor-pointer"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                      <span>Delete Photo</span>
-                    </button>
-                  </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {data.gallery?.map((item, index) => (
+                <div key={item.id} className="p-5 rounded-2xl bg-slate-50 border border-slate-200 flex flex-col gap-4 relative">
+                  <button
+                    type="button"
+                    onClick={() => handleDeleteGalleryItem(item.id)}
+                    className="absolute top-4 right-4 p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-colors"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <Input
-                      label="Photo Name / Title"
-                      value={item.title}
-                      onChange={(e) => {
-                        const newGallery = [...(data.gallery || [])];
-                        newGallery[index].title = e.target.value;
-                        setData({ ...data, gallery: newGallery });
-                      }}
-                    />
-                    <div className="flex flex-col gap-2">
-                      <label className="text-xs font-semibold uppercase tracking-wider text-slate-700">Category</label>
-                      <select
-                        value={item.category}
-                        onChange={(e) => {
-                          const newGallery = [...(data.gallery || [])];
-                          newGallery[index].category = e.target.value as any;
-                          setData({ ...data, gallery: newGallery });
-                        }}
-                        className="w-full bg-white text-slate-900 rounded-xl px-4 py-2.5 text-sm border border-slate-200 focus:outline-none focus:border-blue-500 font-medium"
-                      >
-                        <option value="clinic">Clinic</option>
-                        <option value="consultation">Consultation</option>
-                        <option value="equipment">Equipment</option>
-                        <option value="certificates">Certificates</option>
-                        <option value="reception">Reception</option>
-                      </select>
-                    </div>
-                  </div>
+                  <Input
+                    label="Photo Title"
+                    value={item.title}
+                    onChange={(e) => {
+                      const newGallery = [...(data.gallery || [])];
+                      newGallery[index].title = e.target.value;
+                      setData({ ...data, gallery: newGallery });
+                    }}
+                  />
 
                   <ImageUploader
-                    label="Gallery Photo Image"
-                    value={item.image}
-                    publicId={(item as any).imagePublicId || ""}
+                    label="Gallery Photo (Cloudinary CDN)"
+                    value={item.image || ""}
+                    publicId={item.imagePublicId || ""}
                     folder="gallery"
                     onChange={(url, publicId) => {
                       const newGallery = [...(data.gallery || [])];
                       newGallery[index].image = url;
-                      if (publicId !== undefined) (newGallery[index] as any).imagePublicId = publicId;
+                      newGallery[index].imagePublicId = publicId;
                       setData({ ...data, gallery: newGallery });
                     }}
-                    description="Upload image directly to Cloudinary CDN for this clinic photo item."
-                  />
-
-                  <Input
-                    label="Details / Caption"
-                    value={item.caption || ""}
-                    onChange={(e) => {
-                      const newGallery = [...(data.gallery || [])];
-                      newGallery[index].caption = e.target.value;
-                      setData({ ...data, gallery: newGallery });
-                    }}
-                    placeholder="e.g. Ultra-Low Dose Fluoroscopy System"
                   />
                 </div>
               ))}
-
-              {(!data.gallery || data.gallery.length === 0) && (
-                <div className="text-center py-12 bg-slate-50 rounded-[20px] border border-dashed border-slate-300">
-                  <p className="text-sm font-semibold text-slate-600">No gallery photos found.</p>
-                  <p className="text-xs text-slate-500 mt-1 mb-4">Click below to add your first clinic photo.</p>
-                  <Button type="button" onClick={handleAddGalleryItem} variant="primary" size="sm" leftIcon={<Plus className="w-4 h-4" />}>
-                    Add New Gallery Photo
-                  </Button>
-                </div>
-              )}
             </div>
 
             <div className="flex justify-end pt-4 border-t border-slate-100">
@@ -580,7 +528,213 @@ export default function AdminDashboard() {
           </div>
         )}
 
-        {/* Tab 5: MySQL Database Setup */}
+        {/* Tab 5: Health Articles & Blog */}
+        {activeTab === "blog" && (
+          <div className="bg-white p-6 sm:p-8 rounded-[24px] border border-slate-200 shadow-sm flex flex-col gap-6">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+              <div>
+                <h2 className="text-xl font-bold text-slate-900">Health Articles & Blog Posts</h2>
+                <p className="text-xs text-slate-500 mt-1">Upload, edit, and publish patient guidance articles on your portfolio.</p>
+              </div>
+              <Button type="button" onClick={handleAddBlogPost} variant="outline" size="sm" leftIcon={<Plus className="w-4 h-4" />}>
+                Create New Blog Post
+              </Button>
+            </div>
+
+            <div className="flex flex-col gap-6">
+              {data.blog?.map((post, index) => (
+                <div key={post.id} className="p-5 rounded-2xl bg-slate-50 border border-slate-200 flex flex-col gap-4 relative">
+                  <button
+                    type="button"
+                    onClick={() => handleDeleteBlogPost(post.id)}
+                    className="absolute top-4 right-4 p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-colors"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div className="sm:col-span-2">
+                      <Input
+                        label="Article Title"
+                        value={post.title}
+                        onChange={(e) => {
+                          const newBlog = [...(data.blog || [])];
+                          newBlog[index].title = e.target.value;
+                          setData({ ...data, blog: newBlog });
+                        }}
+                      />
+                    </div>
+                    <Input
+                      label="Category"
+                      value={post.category}
+                      onChange={(e) => {
+                        const newBlog = [...(data.blog || [])];
+                        newBlog[index].category = e.target.value;
+                        setData({ ...data, blog: newBlog });
+                      }}
+                      placeholder="e.g. Dental Care"
+                    />
+                  </div>
+
+                  <div className="flex flex-col gap-1">
+                    <Input
+                      label="Article Custom URL Slug"
+                      value={post.slug || ""}
+                      onChange={(e) => {
+                        const raw = e.target.value;
+                        const slugified = raw.toLowerCase().replace(/[^a-z0-9-]/g, "-").replace(/-+/g, "-");
+                        const newBlog = [...(data.blog || [])];
+                        newBlog[index].slug = slugified;
+                        setData({ ...data, blog: newBlog });
+                      }}
+                      placeholder="e.g. dental-caries-prevention-guide"
+                    />
+                    <span className="text-[11px] font-medium text-slate-500">
+                      Live Article Link: <code className="text-blue-600 bg-blue-50 px-2 py-0.5 rounded border border-blue-200 font-mono">/blog/{post.slug || post.id}</code>
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <Input
+                      label="Read Time"
+                      value={post.readTime}
+                      onChange={(e) => {
+                        const newBlog = [...(data.blog || [])];
+                        newBlog[index].readTime = e.target.value;
+                        setData({ ...data, blog: newBlog });
+                      }}
+                      placeholder="e.g. 5 min read"
+                    />
+                    <Input
+                      label="Published Date"
+                      value={post.date}
+                      onChange={(e) => {
+                        const newBlog = [...(data.blog || [])];
+                        newBlog[index].date = e.target.value;
+                        setData({ ...data, blog: newBlog });
+                      }}
+                      placeholder="e.g. Aug 04, 2026"
+                    />
+                  </div>
+
+                  <Textarea
+                    label="Article Excerpt (Short Summary)"
+                    value={post.excerpt}
+                    onChange={(e) => {
+                      const newBlog = [...(data.blog || [])];
+                      newBlog[index].excerpt = e.target.value;
+                      setData({ ...data, blog: newBlog });
+                    }}
+                  />
+
+                  <Textarea
+                    label="Full Article Content"
+                    value={post.content}
+                    onChange={(e) => {
+                      const newBlog = [...(data.blog || [])];
+                      newBlog[index].content = e.target.value;
+                      setData({ ...data, blog: newBlog });
+                    }}
+                  />
+
+                  <ImageUploader
+                    label="Featured Article Cover Image (Cloudinary CDN)"
+                    value={post.featuredImage || ""}
+                    publicId={post.featuredImagePublicId || ""}
+                    folder="blogs"
+                    onChange={(url, publicId) => {
+                      const newBlog = [...(data.blog || [])];
+                      newBlog[index].featuredImage = url;
+                      newBlog[index].featuredImagePublicId = publicId;
+                      setData({ ...data, blog: newBlog });
+                    }}
+                  />
+                </div>
+              ))}
+
+              {(!data.blog || data.blog.length === 0) && (
+                <div className="text-center py-12 bg-slate-50 rounded-[20px] border border-dashed border-slate-300">
+                  <p className="text-sm font-semibold text-slate-600">No blog posts found.</p>
+                  <p className="text-xs text-slate-500 mt-1 mb-4">Click below to publish your first health article.</p>
+                  <Button type="button" onClick={handleAddBlogPost} variant="primary" size="sm" leftIcon={<Plus className="w-4 h-4" />}>
+                    Create New Blog Post
+                  </Button>
+                </div>
+              )}
+            </div>
+
+            <div className="flex justify-end pt-4 border-t border-slate-100">
+              <Button onClick={handleSave} variant="primary" isLoading={saving} leftIcon={<Save className="w-4 h-4" />}>
+                Save Blog Changes
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {/* Tab 6: SEO & Meta Tags */}
+        {activeTab === "seo" && (
+          <form onSubmit={handleSave} className="bg-white p-6 sm:p-8 rounded-[24px] border border-slate-200 shadow-sm flex flex-col gap-6">
+            <h2 className="text-xl font-bold text-slate-900 pb-3 border-b border-slate-100 flex items-center justify-between">
+              <div>
+                <span>SEO & Search Engine Optimization Meta Tags</span>
+                <p className="text-xs text-slate-500 mt-1 font-normal">Optimize your website ranking on Google, Bing & Social Media previews.</p>
+              </div>
+            </h2>
+
+            <Input
+              label="SEO Meta Title (<title> Tag)"
+              value={data.doctor.seoTitle || ""}
+              onChange={(e) =>
+                setData({ ...data, doctor: { ...data.doctor, seoTitle: e.target.value } })
+              }
+              placeholder="e.g. Dr. Farzana Khan Mohima | Lead Dental Surgeon & Specialist"
+            />
+
+            <Textarea
+              label="SEO Meta Description (<meta name='description'>)"
+              value={data.doctor.seoDescription || ""}
+              onChange={(e) =>
+                setData({ ...data, doctor: { ...data.doctor, seoDescription: e.target.value } })
+              }
+              placeholder="e.g. Official portfolio of Dr. Farzana Khan Mohima, Lead Dental Surgeon Specialist. Schedule priority consultations..."
+            />
+
+            <Textarea
+              label="SEO Keywords (Comma Separated)"
+              value={data.doctor.seoKeywords || ""}
+              onChange={(e) =>
+                setData({ ...data, doctor: { ...data.doctor, seoKeywords: e.target.value } })
+              }
+              placeholder="e.g. Dr. Farzana Khan Mohima, Dental Surgeon Dhaka, Dental Implant Specialist, Paediatric Dentistry"
+            />
+
+            <ImageUploader
+              label="OpenGraph Social Share Image (Facebook, WhatsApp, Twitter Preview)"
+              value={data.doctor.ogImage || ""}
+              publicId={(data.doctor as any).ogImagePublicId || ""}
+              folder="seo"
+              onChange={(url, publicId) =>
+                setData({
+                  ...data,
+                  doctor: {
+                    ...data.doctor,
+                    ogImage: url,
+                    ogImagePublicId: publicId,
+                  } as any,
+                })
+              }
+              helperText="Upload image for link previews when sharing your portfolio link on WhatsApp, Facebook, or Twitter."
+            />
+
+            <div className="flex justify-end pt-4">
+              <Button type="submit" variant="primary" isLoading={saving} leftIcon={<Save className="w-4 h-4" />}>
+                Save SEO Settings
+              </Button>
+            </div>
+          </form>
+        )}
+
+        {/* Tab 7: MySQL Database Setup */}
         {activeTab === "database" && (
           <div className="bg-white p-6 sm:p-8 rounded-[24px] border border-slate-200 shadow-sm flex flex-col gap-6">
             <h2 className="text-xl font-bold text-slate-900 pb-3 border-b border-slate-100 flex items-center justify-between">
@@ -598,7 +752,7 @@ export default function AdminDashboard() {
             </h2>
 
             <p className="text-sm text-slate-600 leading-relaxed">
-              Paste your destination database connection URL below. Any details, clinical services, or uploaded pictures will automatically sink into your destination MySQL database!
+              Paste your destination database connection URL below. Any details, clinical services, gallery photos, articles, or uploaded pictures will automatically sink into your destination MySQL database!
             </p>
 
             <form onSubmit={handleSave} className="flex flex-col gap-4 p-5 rounded-2xl bg-slate-50 border border-slate-200">
@@ -611,42 +765,15 @@ export default function AdminDashboard() {
                 placeholder="mysql://user:password@host:port/database"
               />
 
-              <div className="flex justify-end pt-2">
+              <div className="flex justify-end">
                 <Button type="submit" variant="primary" isLoading={saving} leftIcon={<Database className="w-4 h-4" />}>
                   Connect & Sync Destination Database
                 </Button>
               </div>
             </form>
-
-            <div className="pt-4 border-t border-slate-100">
-              <h3 className="text-sm font-bold text-slate-900 mb-2">Manual Environment Configuration (.env.local)</h3>
-              <p className="text-xs text-slate-600 mb-3">
-                Alternatively, you can add <code>DATABASE_URL</code> directly to your <code>.env.local</code> file:
-              </p>
-              <pre className="p-4 rounded-xl bg-slate-900 text-blue-300 text-xs font-mono overflow-x-auto">
-DATABASE_URL=&quot;mysql://user:password@host:3306/database_name&quot;
-              </pre>
-            </div>
-
-            <div className="p-5 rounded-2xl bg-blue-50 border border-blue-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-              <div>
-                <span className="text-sm font-bold text-slate-900 block">Download Backup SQL Schema Script</span>
-                <span className="text-xs text-slate-600">
-                  Tables are automatically initialized when saving. You can also import this SQL file manually into PHPMyAdmin.
-                </span>
-              </div>
-              <a
-                href="/scripts/schema.sql"
-                download
-                className="px-4 py-2 rounded-full bg-blue-600 text-white text-xs font-bold hover:bg-blue-700 transition-colors shrink-0"
-              >
-                Download schema.sql
-              </a>
-            </div>
           </div>
         )}
       </div>
     </div>
   );
 }
-

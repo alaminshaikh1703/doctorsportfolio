@@ -170,7 +170,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ doctor = DOCTOR_PROFIL
               variants={fadeUpVariant}
               className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-slate-900 leading-[1.12] tracking-tight mb-6"
             >
-              Meet <span className="text-blue-600">dr. Farzana</span> Khan Mohima
+              Meet <span className="text-blue-600">Dr. Farzana</span> Khan Mohima
             </motion.h1>
 
             {/* 3. Subheadline */}

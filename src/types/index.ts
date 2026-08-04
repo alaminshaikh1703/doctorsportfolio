@@ -39,6 +39,11 @@ export interface DoctorProfile {
     platform: 'facebook' | 'twitter' | 'linkedin' | 'youtube' | 'instagram';
     url: string;
   }[];
+  seoTitle?: string;
+  seoDescription?: string;
+  seoKeywords?: string;
+  ogImage?: string;
+  ogImagePublicId?: string;
 }
 
 export interface Specialty {
@@ -143,4 +148,18 @@ export interface SectionTitleProps {
   subtitle?: string;
   align?: 'left' | 'center';
   className?: string;
+}
+
+export interface FullPortfolioData {
+  doctor: DoctorProfile;
+  specialties: Specialty[];
+  services: MedicalService[];
+  statistics: StatisticItem[];
+  timeline: TimelineItem[];
+  testimonials: PatientTestimonial[];
+  gallery: GalleryItem[];
+  blog: BlogPost[];
+  faqs: FAQItem[];
+  isDatabaseConnected?: boolean;
+  databaseUrl?: string;
 }

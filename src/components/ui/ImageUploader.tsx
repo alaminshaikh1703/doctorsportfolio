@@ -11,6 +11,7 @@ interface ImageUploaderProps {
   folder?: string;
   onChange: (url: string, publicId?: string) => void;
   description?: string;
+  helperText?: string;
 }
 
 export const ImageUploader: React.FC<ImageUploaderProps> = ({
@@ -20,6 +21,7 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
   folder = "doctors",
   onChange,
   description,
+  helperText,
 }) => {
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -150,6 +152,7 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
 
           {error && <span className="text-xs text-red-600 font-semibold">{error}</span>}
           {description && <span className="text-xs text-slate-500">{description}</span>}
+          {helperText && <span className="text-xs text-slate-500">{helperText}</span>}
         </div>
       </div>
     </div>

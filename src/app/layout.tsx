@@ -1,10 +1,9 @@
 import type { Metadata, Viewport } from "next";
 import { Plus_Jakarta_Sans, Inter } from "next/font/google";
 import "./globals.css";
-import { Navbar } from "../components/layout/Navbar";
-import { Footer } from "../components/layout/Footer";
 import { ScrollProgressProvider } from "../providers/ScrollProgressProvider";
 import { DOCTOR_PROFILE, FAQ_DATA, TESTIMONIALS_DATA, BLOG_DATA } from "../constants/doctorData";
+import { getDoctorData } from "../lib/getDoctorData";
 import {
   generatePhysicianSchema,
   generateMedicalClinicSchema,
@@ -37,69 +36,53 @@ export const viewport: Viewport = {
   maximumScale: 5,
 };
 
-export const metadata: Metadata = {
-  metadataBase: new URL("https://drvancecardiology.com"),
-  manifest: "/manifest.json",
-  title: {
-    default: `${DOCTOR_PROFILE.name} | ${DOCTOR_PROFILE.title}`,
-    template: `%s | ${DOCTOR_PROFILE.name}`,
-  },
-  description: DOCTOR_PROFILE.bio,
-  keywords: [
-    "Cardiologist NY",
-    "Interventional Cardiology",
-    "Heart Specialist New York",
-    "Coronary Angioplasty",
-    "Preventive Heart Care",
-    "3D Stress Echocardiogram",
-    "Hypertension Management",
-    "Dr Marcus Vance",
-  ],
-  authors: [{ name: DOCTOR_PROFILE.name }],
-  creator: DOCTOR_PROFILE.name,
-  publisher: "Metropolitan Heart & Vascular Center",
-  formatDetection: {
-    email: true,
-    address: true,
-    telephone: true,
-  },
-  openGraph: {
-    type: "website",
-    locale: "en_US",
-    url: "https://drvancecardiology.com",
-    siteName: `${DOCTOR_PROFILE.name} Portfolio & Cardiology Clinic`,
-    title: `${DOCTOR_PROFILE.name} | Top Interventional Cardiologist in NY`,
-    description: DOCTOR_PROFILE.bio,
-    images: [
-      {
-        url: "/images/og-image.jpg",
-        width: 1200,
-        height: 630,
-        alt: `${DOCTOR_PROFILE.name} - Interventional Cardiology Practice`,
-      },
-    ],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: `${DOCTOR_PROFILE.name} | Interventional Cardiologist`,
-    description: DOCTOR_PROFILE.bio,
-    images: ["/images/og-image.jpg"],
-  },
-  robots: {
-    index: true,
-    follow: true,
-    googleBot: {
+export async function generateMetadata(): Promise<Metadata> {
+  const data = await getDoctorData();
+  const doctor = data.doctor;
+
+  const title = doctor.seoTitle || `${doctor.name} | ${doctor.title}`;
+  const description = doctor.seoDescription || doctor.bio || "Official medical portfolio & dental specialist clinic.";
+  const keywordsList = doctor.seoKeywords
+    ? doctor.seoKeywords.split(",").map((k) => k.trim())
+    : [doctor.name, doctor.title, "Dental Surgeon", "Dental Specialist"];
+  const ogImageUrl = doctor.ogImage || doctor.heroImage || "https://aavisstudio.com/wp-content/uploads/2026/07/farzana-khan-mohima.png";
+
+  return {
+    metadataBase: new URL("https://doctorsportfolio-zeta.vercel.app"),
+    title: title,
+    description: description,
+    keywords: keywordsList,
+    authors: [{ name: doctor.name }],
+    creator: doctor.name,
+    publisher: `${doctor.name} Dental & Implant Clinic`,
+    openGraph: {
+      type: "website",
+      locale: "en_US",
+      url: "https://doctorsportfolio-zeta.vercel.app",
+      siteName: `${doctor.name} Portfolio & Clinic`,
+      title: title,
+      description: description,
+      images: [
+        {
+          url: ogImageUrl,
+          width: 1200,
+          height: 630,
+          alt: `${doctor.name} - ${doctor.title}`,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: title,
+      description: description,
+      images: [ogImageUrl],
+    },
+    robots: {
       index: true,
       follow: true,
-      "max-video-preview": -1,
-      "max-image-preview": "large",
-      "max-snippet": -1,
     },
-  },
-  alternates: {
-    canonical: "https://drvancecardiology.com",
-  },
-};
+  };
+}
 
 export default function RootLayout({
   children,
@@ -158,4 +141,4 @@ export default function RootLayout({
       </body>
     </html>
   );
-};
+}
