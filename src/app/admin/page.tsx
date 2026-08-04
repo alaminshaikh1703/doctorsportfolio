@@ -217,7 +217,7 @@ export default function AdminPage() {
             </div>
             <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Admin Portal Access</h1>
             <p className="text-xs font-semibold text-blue-600 tracking-wide uppercase mt-1.5">
-              Doctor's Data • Management
+              Doctor&apos;s Data • Management
             </p>
           </div>
 
