@@ -151,7 +151,7 @@ export const TIMELINE_DATA: TimelineItem[] = [
     year: "Jul 2022- Jun 2023",
     title: "PGT",
     institution: "Sapporo Dental College & Hospital",
-    degreeOrRole: "Post Graduate Training in Dental Surgery",
+    degreeOrRole: "Post Graduate Training on Dept of Conservative Dentistry & Endodontics and Dept of Prosthodontics",
     type: "residency",
     description: "",
   },
