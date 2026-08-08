@@ -1037,7 +1037,7 @@ export default function AdminPage() {
                 </Button>
 
                 <Button
-                  onClick={fetchAppointments}
+                  onClick={() => fetchAppointments()}
                   variant="outline"
                   size="sm"
                   isLoading={loadingAppointments}
