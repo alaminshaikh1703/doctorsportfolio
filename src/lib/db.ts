@@ -242,6 +242,167 @@ export async function autoInitDatabaseTables(pool: mysql.Pool): Promise<{ succes
     `);
     await pool.query(`ALTER TABLE blog ADD COLUMN IF NOT EXISTS featured_image_public_id VARCHAR(255);`).catch(() => {});
 
+    // ========================================================================
+    // CLINICAL APPOINTMENT SYSTEM RELATIONAL MIGRATIONS
+    // ========================================================================
+
+    // 1. Patients Table
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS \`patients\` (
+        \`id\` VARCHAR(50) PRIMARY KEY,
+        \`full_name\` VARCHAR(255) NOT NULL,
+        \`phone\` VARCHAR(50) NOT NULL UNIQUE,
+        \`email\` VARCHAR(100),
+        \`age\` INT NULL,
+        \`created_at\` DATETIME DEFAULT CURRENT_TIMESTAMP,
+        \`updated_at\` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+    `);
+    await pool.query(`ALTER TABLE patients ADD COLUMN IF NOT EXISTS age INT NULL;`).catch(() => {});
+
+    // 2. Doctors Table
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS \`doctors\` (
+        \`id\` VARCHAR(50) PRIMARY KEY,
+        \`name\` VARCHAR(255) NOT NULL,
+        \`specialization\` VARCHAR(255) NOT NULL,
+        \`status\` ENUM('Active', 'Inactive') DEFAULT 'Active',
+        \`created_at\` DATETIME DEFAULT CURRENT_TIMESTAMP
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+    `);
+
+    // 3. Clinics Table
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS \`clinics\` (
+        \`id\` VARCHAR(50) PRIMARY KEY,
+        \`doctor_id\` VARCHAR(50) NOT NULL,
+        \`clinic_name\` VARCHAR(255) NOT NULL,
+        \`address\` TEXT NOT NULL,
+        \`phone\` VARCHAR(50),
+        \`working_days\` TEXT,
+        \`opening_time\` VARCHAR(50) DEFAULT '09:00 AM',
+        \`closing_time\` VARCHAR(50) DEFAULT '08:00 PM',
+        \`status\` ENUM('Active', 'Inactive') DEFAULT 'Active',
+        \`created_at\` DATETIME DEFAULT CURRENT_TIMESTAMP
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+    `);
+
+    // 4. Appointment Slots Table
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS \`appointment_slots\` (
+        \`id\` VARCHAR(50) PRIMARY KEY,
+        \`clinic_id\` VARCHAR(50) NOT NULL,
+        \`day_of_week\` VARCHAR(50) NOT NULL,
+        \`start_time\` VARCHAR(50) NOT NULL,
+        \`end_time\` VARCHAR(50) NOT NULL,
+        \`max_capacity\` INT DEFAULT 2,
+        \`status\` ENUM('Active', 'Inactive') DEFAULT 'Active',
+        \`created_at\` DATETIME DEFAULT CURRENT_TIMESTAMP
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+    `);
+
+    // 5. Appointments Table
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS \`appointments\` (
+        \`id\` VARCHAR(50) PRIMARY KEY,
+        \`appointment_number\` VARCHAR(50) NOT NULL UNIQUE,
+        \`patient_id\` VARCHAR(50) NOT NULL,
+        \`doctor_id\` VARCHAR(50) NOT NULL,
+        \`clinic_id\` VARCHAR(50) NOT NULL,
+        \`service_id\` VARCHAR(50) NOT NULL,
+        \`appointment_date\` DATE NOT NULL,
+        \`appointment_slot_id\` VARCHAR(50) NOT NULL,
+        \`appointment_time\` VARCHAR(50) NOT NULL,
+        \`appointment_type\` ENUM('Regular', 'Emergency') DEFAULT 'Regular',
+        \`patient_age\` INT NULL,
+        \`visited\` TINYINT(1) DEFAULT 0,
+        \`confirmed_at\` DATETIME NULL,
+        \`completed_at\` DATETIME NULL,
+        \`reason\` TEXT,
+        \`status\` ENUM('Pending', 'Confirmed', 'Completed', 'Cancelled', 'No Show') DEFAULT 'Pending',
+        \`booking_source\` ENUM('Website', 'Website + WhatsApp', 'Admin') DEFAULT 'Website',
+        \`admin_note\` TEXT,
+        \`is_deleted\` TINYINT(1) DEFAULT 0,
+        \`created_at\` DATETIME DEFAULT CURRENT_TIMESTAMP,
+        \`updated_at\` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+    `);
+    await pool.query(`ALTER TABLE appointments ADD COLUMN IF NOT EXISTS patient_age INT NULL;`).catch(() => {});
+
+    // 6. Status History Table
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS \`appointment_status_history\` (
+        \`id\` VARCHAR(50) PRIMARY KEY,
+        \`appointment_id\` VARCHAR(50) NOT NULL,
+        \`status\` VARCHAR(50) NOT NULL,
+        \`changed_by\` VARCHAR(50) DEFAULT 'Admin',
+        \`created_at\` DATETIME DEFAULT CURRENT_TIMESTAMP
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+    `);
+
+    // AUTO-SEED DEFAULT DOCTOR IF MISSING
+    await pool.query(
+      `INSERT IGNORE INTO doctors (id, name, specialization, status) VALUES (?, ?, ?, ?);`,
+      ['doc-1', 'Dr. Farzana Khan Mohima', 'Dental Surgeon Specialist (BDS, PGT, MPH)', 'Active']
+    ).catch(() => {});
+
+    // AUTO-SEED DEFAULT CLINICS IF MISSING
+    await pool.query(
+      `INSERT IGNORE INTO clinics (id, doctor_id, clinic_name, address, phone, working_days, opening_time, closing_time, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);`,
+      [
+        'clinic-1',
+        'doc-1',
+        "Aveek's Dental and Implant Center(Sat-Thu)",
+        'House 42, Road 4, Mohakhali DOHS, Dhaka 1206',
+        '+8801531714840',
+        JSON.stringify(['Saturday', 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday']),
+        '09:00 AM',
+        '08:00 PM',
+        'Active'
+      ]
+    ).catch(() => {});
+
+    await pool.query(
+      `INSERT IGNORE INTO clinics (id, doctor_id, clinic_name, address, phone, working_days, opening_time, closing_time, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);`,
+      [
+        'clinic-2',
+        'doc-1',
+        'My Dentist & Maxillofacial Surgery(Sat-Thu)',
+        'Branch 2, Dhanmondi, Dhaka',
+        '+8801531714840',
+        JSON.stringify(['Saturday', 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday']),
+        '04:00 PM',
+        '09:00 PM',
+        'Active'
+      ]
+    ).catch(() => {});
+
+    // AUTO-SEED DEFAULT APPOINTMENT SLOTS FOR CLINICS IF MISSING
+    const days = ['Saturday', 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday'];
+    const defaultSlots = [
+      { start: '09:00 AM', end: '09:30 AM' },
+      { start: '10:30 AM', end: '11:00 AM' },
+      { start: '02:00 PM', end: '02:30 PM' },
+      { start: '04:00 PM', end: '04:30 PM' },
+      { start: '06:00 PM', end: '06:30 PM' },
+    ];
+
+    for (const cId of ['clinic-1', 'clinic-2']) {
+      const [slotRows]: any = await pool.query(`SELECT id FROM appointment_slots WHERE clinic_id = ? LIMIT 1;`, [cId]).catch(() => [[]]);
+      if (!slotRows || slotRows.length === 0) {
+        for (const day of days) {
+          for (let i = 0; i < defaultSlots.length; i++) {
+            const s = defaultSlots[i];
+            const slotId = `slot-${cId}-${day.toLowerCase().slice(0, 3)}-${i + 1}`;
+            await pool.query(
+              `INSERT IGNORE INTO appointment_slots (id, clinic_id, day_of_week, start_time, end_time, max_capacity, status) VALUES (?, ?, ?, ?, ?, ?, ?);`,
+              [slotId, cId, day, s.start, s.end, 2, 'Active']
+            ).catch(() => {});
+          }
+        }
+      }
+    }
+
     return { success: true };
   } catch (error) {
     const msg = (error as Error).message;
@@ -250,6 +411,8 @@ export async function autoInitDatabaseTables(pool: mysql.Pool): Promise<{ succes
   }
 }
 
+let isTablesInitialized = false;
+
 /**
  * Runs SQL queries against active database connection
  */
@@ -257,14 +420,20 @@ export async function query<T = any>(sql: string, params: any[] = []): Promise<T
   const pool = getPool();
   if (!pool) return null;
 
+  if (!isTablesInitialized) {
+    await autoInitDatabaseTables(pool).catch(() => {});
+    isTablesInitialized = true;
+  }
+
   try {
     const [rows] = await pool.execute(sql, params);
     return rows as T;
   } catch (error) {
     const errMsg = (error as Error).message;
     console.warn("MySQL Database connection query failed, using static fallback dataset:", errMsg);
-    if (errMsg.includes("closed") || errMsg.includes("PROTOCOL") || errMsg.includes("ECONNRESET")) {
+    if (errMsg.includes("closed") || errMsg.includes("PROTOCOL") || errMsg.includes("ECONNRESET") || errMsg.includes("doesn't exist")) {
       activePool = null;
+      isTablesInitialized = false;
     }
     return null;
   }

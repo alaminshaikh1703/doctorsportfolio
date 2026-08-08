@@ -1,5 +1,5 @@
 /**
- * Domain Type Definitions for Doctor Portfolio Architecture
+ * Domain Type Definitions for Doctor Portfolio Architecture & Appointment System
  */
 
 export interface DoctorProfile {
@@ -132,22 +132,126 @@ export interface FAQItem {
   category: string;
 }
 
-export interface AppointmentFormData {
-  serviceId: string;
-  patientName: string;
-  patientPhone: string;
-  patientEmail: string;
-  preferredDate: string;
-  preferredTime: string;
-  reason: string;
-}
-
 export interface SectionTitleProps {
   label: string;
   title: string;
   subtitle?: string;
   align?: 'left' | 'center';
   className?: string;
+}
+
+// ============================================================================
+// CLINICAL APPOINTMENT SYSTEM RELATIONAL TYPES
+// ============================================================================
+
+export interface PatientRecord {
+  id: string;
+  fullName: string;
+  phone: string;
+  email?: string;
+  patientAge?: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface DoctorEntity {
+  id: string;
+  name: string;
+  specialization: string;
+  status: 'Active' | 'Inactive';
+  createdAt?: string;
+}
+
+export interface ClinicEntity {
+  id: string;
+  doctorId: string;
+  clinicName: string;
+  address: string;
+  phone: string;
+  workingDays: string[];
+  openingTime: string;
+  closingTime: string;
+  status: 'Active' | 'Inactive';
+  createdAt?: string;
+}
+
+export interface ServiceEntity {
+  id: string;
+  serviceName: string;
+  duration: string;
+  status: 'Active' | 'Inactive';
+  createdAt?: string;
+}
+
+export interface AppointmentSlotEntity {
+  id: string;
+  clinicId: string;
+  dayOfWeek: string;
+  startTime: string;
+  endTime: string;
+  maxCapacity: number;
+  bookedCount?: number;
+  status: 'Active' | 'Inactive';
+  createdAt?: string;
+}
+
+export type AppointmentStatus = 'Pending' | 'Confirmed' | 'Completed' | 'Cancelled' | 'No Show';
+export type BookingSource = 'Website' | 'Website + WhatsApp' | 'Admin';
+export type AppointmentType = 'Regular' | 'Emergency';
+
+export interface AppointmentRecord {
+  id: string;
+  appointmentNumber: string; // e.g. APT-20260805-0001
+  patientId: string;
+  patientName: string;
+  patientPhone: string;
+  patientEmail?: string;
+  patientAge?: number;
+  doctorId: string;
+  doctorName?: string;
+  clinicId: string;
+  clinicName?: string;
+  clinicAddress?: string;
+  serviceId: string;
+  serviceName?: string;
+  appointmentDate: string;
+  appointmentSlotId: string;
+  appointmentTime: string;
+  appointmentType: AppointmentType;
+  visited: boolean;
+  confirmedAt?: string | null;
+  completedAt?: string | null;
+  reason?: string;
+  status: AppointmentStatus;
+  bookingSource: BookingSource;
+  adminNote?: string;
+  isDeleted?: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface AppointmentStatusHistory {
+  id: string;
+  appointmentId: string;
+  status: AppointmentStatus;
+  changedBy: 'Patient' | 'Admin';
+  createdAt: string;
+}
+
+export interface AppointmentBookingRequest {
+  doctorId: string;
+  clinicId: string;
+  serviceId: string;
+  appointmentDate: string;
+  appointmentSlotId: string;
+  appointmentTime: string;
+  appointmentType: AppointmentType;
+  patientName: string;
+  patientPhone: string;
+  patientEmail?: string;
+  patientAge?: number;
+  reason?: string;
+  bookingSource: BookingSource;
 }
 
 export interface FullPortfolioData {
