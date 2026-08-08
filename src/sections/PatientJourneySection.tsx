@@ -16,7 +16,7 @@ const JOURNEY_STEPS = [
 
 export const PatientJourneySection: React.FC = () => {
   return (
-    <section className="py-20 lg:py-32 bg-white relative">
+    <section className="hidden md:block py-20 lg:py-32 bg-white relative">
       <div className="max-w-[1320px] mx-auto px-4 sm:px-6 lg:px-8">
         <SectionTitle
           label="Patient Journey"

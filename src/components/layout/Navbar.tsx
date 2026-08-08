@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { motion, AnimatePresence, LayoutGroup } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { Stethoscope, PhoneCall, Menu, X, Calendar } from "lucide-react";
 import { Button } from "../ui/Button";
 import { DOCTOR_PROFILE } from "../../constants/doctorData";
@@ -26,45 +26,33 @@ interface NavbarProps {
 export const Navbar: React.FC<NavbarProps> = ({ doctor = DOCTOR_PROFILE }) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [activeSection, setActiveSection] = useState<string>("hero");
   const pathname = usePathname();
 
+  // Lightweight requestAnimationFrame throttled scroll listener for navbar background state
   useEffect(() => {
+    let ticking = false;
+
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
-
-      // Section scroll spy tracking on homepage
-      if (!pathname || pathname === "/") {
-        const sections = ["hero", "about", "specialties", "services", "timeline"];
-        const scrollPosition = window.scrollY + 180;
-
-        for (let i = sections.length - 1; i >= 0; i--) {
-          const sectionId = sections[i];
-          const el = document.getElementById(sectionId);
-          if (el) {
-            const top = el.offsetTop;
-            if (scrollPosition >= top - 80) {
-              setActiveSection(sectionId);
-              break;
-            }
-          }
-        }
-      } else if (pathname.startsWith("/blog")) {
-        setActiveSection("blog");
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          setIsScrolled(window.scrollY > 20);
+          ticking = false;
+        });
+        ticking = true;
       }
     };
 
-    handleScroll();
+    setIsScrolled(window.scrollY > 20);
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
-  }, [pathname]);
+  }, []);
 
   return (
     <header
       className={cn(
-        "fixed top-0 left-0 right-0 z-50 transition-all duration-300 py-4",
+        "fixed top-0 left-0 right-0 z-50 transition-all duration-300 py-3 sm:py-4",
         isScrolled || (pathname && pathname !== "/")
-          ? "bg-white/95 backdrop-blur-md border-b border-slate-200/80 shadow-xs py-3"
+          ? "bg-white/95 backdrop-blur-md border-b border-slate-200/80 shadow-xs py-2.5 sm:py-3"
           : "bg-transparent"
       )}
     >
@@ -87,45 +75,27 @@ export const Navbar: React.FC<NavbarProps> = ({ doctor = DOCTOR_PROFILE }) => {
           </div>
         </Link>
 
-        {/* Desktop Nav Items with Ultra Smooth Pill Sliding */}
-        <LayoutGroup id="navbar-pill-group">
-          <nav className="hidden lg:flex items-center gap-1 shrink-0 relative bg-slate-100/60 p-1 rounded-full border border-slate-200/50">
-            {NAV_LINKS.map((link) => {
-              const isActive =
-                link.sectionId === "blog"
-                  ? pathname && pathname.startsWith("/blog")
-                  : pathname === "/" && activeSection === link.sectionId;
+        {/* Desktop Nav Items - Native Anchor Navigation */}
+        <nav className="hidden lg:flex items-center gap-1 shrink-0 bg-slate-100/80 p-1.5 rounded-full border border-slate-200/60">
+          {NAV_LINKS.map((link) => {
+            const isBlogActive = link.sectionId === "blog" && pathname?.startsWith("/blog");
 
-              return (
-                <Link
-                  key={link.name}
-                  href={link.href}
-                  onClick={() => setActiveSection(link.sectionId)}
-                  className={cn(
-                    "relative text-xs xl:text-sm font-bold transition-colors duration-200 whitespace-nowrap rounded-full px-4 py-1.5 cursor-pointer select-none",
-                    isActive
-                      ? "text-blue-600"
-                      : "text-slate-600 hover:text-blue-600"
-                  )}
-                >
-                  {isActive && (
-                    <motion.div
-                      layoutId="activeNavPill"
-                      className="absolute inset-0 bg-white border border-slate-200/90 rounded-full -z-10 shadow-xs"
-                      transition={{
-                        type: "spring",
-                        stiffness: 350,
-                        damping: 32,
-                        mass: 0.8,
-                      }}
-                    />
-                  )}
-                  <span>{link.name}</span>
-                </Link>
-              );
-            })}
-          </nav>
-        </LayoutGroup>
+            return (
+              <Link
+                key={link.name}
+                href={link.href}
+                className={cn(
+                  "text-xs xl:text-sm font-bold whitespace-nowrap rounded-full px-4 py-1.5 select-none transition-colors",
+                  isBlogActive
+                    ? "bg-white text-blue-600 shadow-sm border border-slate-200/80"
+                    : "text-slate-600 hover:text-blue-600"
+                )}
+              >
+                {link.name}
+              </Link>
+            );
+          })}
+        </nav>
 
         {/* Desktop CTA & Phone */}
         <div className="hidden sm:flex items-center gap-3 shrink-0">
@@ -162,21 +132,18 @@ export const Navbar: React.FC<NavbarProps> = ({ doctor = DOCTOR_PROFILE }) => {
       <AnimatePresence>
         {mobileMenuOpen && (
           <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.25, ease: "easeInOut" }}
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.18, ease: "easeOut" }}
             className="lg:hidden bg-white border-b border-slate-200 shadow-xl overflow-hidden"
           >
-            <div className="max-w-md mx-auto px-6 py-6 flex flex-col gap-4">
+            <div className="max-w-md mx-auto px-6 py-5 flex flex-col gap-3">
               {NAV_LINKS.map((link) => (
                 <Link
                   key={link.name}
                   href={link.href}
-                  onClick={() => {
-                    setActiveSection(link.sectionId);
-                    setMobileMenuOpen(false);
-                  }}
+                  onClick={() => setMobileMenuOpen(false)}
                   className="text-base font-semibold text-slate-800 hover:text-blue-600 py-2 border-b border-slate-100"
                 >
                   {link.name}

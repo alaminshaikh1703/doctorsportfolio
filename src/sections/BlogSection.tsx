@@ -19,7 +19,7 @@ interface BlogSectionProps {
 
 export const BlogSection: React.FC<BlogSectionProps> = ({ blog = BLOG_DATA }) => {
   return (
-    <section id="blog" className="py-20 lg:py-32 bg-slate-50/60 relative">
+    <section id="blog" className="hidden md:block py-20 lg:py-32 bg-slate-50/60 relative">
       <div className="max-w-[1320px] mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col md:flex-row items-start md:items-end justify-between gap-6 mb-12">
           <SectionTitle

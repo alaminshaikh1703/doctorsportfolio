@@ -690,7 +690,7 @@ export default function AdminPage() {
               required
               value={loginEmail}
               onChange={(e) => setLoginEmail(e.target.value)}
-              placeholder="adminlogin@aavisit.com"
+              placeholder="example@gmail.com"
               className="bg-white text-slate-900 font-semibold border-slate-300 focus:border-blue-600"
             />
 
@@ -704,7 +704,7 @@ export default function AdminPage() {
                   required
                   value={loginPassword}
                   onChange={(e) => setLoginPassword(e.target.value)}
-                  placeholder="••••••••••••"
+                  placeholder="••••"
                   className="w-full bg-white text-slate-900 font-semibold border border-slate-300 rounded-2xl px-4 py-3.5 text-sm focus:outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-100 placeholder-slate-400 transition-all pr-12"
                 />
                 <button
